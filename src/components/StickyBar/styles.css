@@ -1,0 +1,57 @@
+.sticky-bar {
+  position: fixed;
+  width: 100%;
+  background: #4c4c4c;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.date {
+  color: #fff;
+  text-decoration: underline;
+  margin: 0 0.5rem;
+}
+
+h2 {
+  margin: 0 1rem;
+}
+
+.button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+.sticky-bar .text {
+  display: flex;
+  align-items: center;
+}
+
+.sticky-bar .text p {
+  text-align: left;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.sticky-bar .text p span {
+  margin-right: 0.5rem;
+}
+
+@media only screen and (min-width: 600px) {
+  .sticky-bar .text p {
+    font-size: 1.5rem;
+  }
+
+  .button {
+    font-size: 1.5rem;
+    padding: 0.8rem 1.5rem;
+  }
+}

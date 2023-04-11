@@ -1,0 +1,12 @@
+.transaction {
+  display: flex;
+  justify-content: space-between;
+}
+
+.transaction > p {
+  margin-right: 1rem;
+}
+
+.transaction > p:last-child {
+  margin-right: 0;
+}
