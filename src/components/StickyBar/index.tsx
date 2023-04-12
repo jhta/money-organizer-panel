@@ -4,10 +4,13 @@ import { ContentForMain } from './components/ContentForMain';
 import {
   useHasAllSelectedTransactionsCategory,
   useHasTransactions,
+  useReport,
+  useSelectedTransactions,
 } from '~/store/useSelectors';
 import { Routes } from '~/routing/Routes';
 import './styles.css';
 import { useState } from 'react';
+import firebaseService from '~/services/firebase/firebaseService';
 
 const BUTTON_TEXT_BY_ROUTE: Record<string, string> = {
   [Routes.Main]: 'Create report',
@@ -18,7 +21,7 @@ const BUTTON_TEXT_BY_ROUTE: Record<string, string> = {
 function useButtonByRoute() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [disable, setDisable] = useState(false);
+  const report = useReport();
 
   const text = BUTTON_TEXT_BY_ROUTE[pathname] || '';
 
@@ -31,6 +34,8 @@ function useButtonByRoute() {
         navigate(Routes.AddCategories);
         break;
       case Routes.AddCategories:
+        firebaseService.addReport(report);
+        console.log('report submitted', report);
         alert('Report submitted');
         break;
 
@@ -38,8 +43,6 @@ function useButtonByRoute() {
         break;
     }
   };
-
-  const disabled = false;
 
   return {
     text,
@@ -59,15 +62,12 @@ export const StickyBar = () => {
   const disabled =
     pathname === Routes.AddCategories && !hasAllSelectedTransactionsCategory;
 
-  console.log('disabled', disabled);
-  console.log('equal', pathname === Routes.AddCategories);
-  console.log({ pathname, hasAllSelectedTransactionsCategory });
-
   return (
     <div className="sticky-bar">
       <div className="text">
         {pathname === Routes.Main && <ContentForMain key="main" />}
         {pathname === Routes.SubmitReport && <ContentForSubmitReport />}
+        {pathname === Routes.AddCategories && <ContentForSubmitReport />}
       </div>
       <div>
         <button disabled={disabled} onClick={onClick} className="button">

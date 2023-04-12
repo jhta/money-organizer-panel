@@ -11,7 +11,7 @@
   box-sizing: border-box;
   padding: 1rem;
   width: 300px;
-  min-height: 100px;
+  min-height: 110px;
   display: flex;
   justify-content: center;
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import chicken from '~/assets/chicken.svg';
 import revolutLogo from '~/assets/revolut.png';
 import abnAmroLogo from '~/assets/abn-amro-logo.png';
-import { ExpensesReport, Transaction } from '~/types';
+import { Transaction } from '~/types';
 import { TransactionList } from '~/components/TransactionList';
 import {
   extractRevolutReportFromCSV,
@@ -18,12 +18,6 @@ import {
 import { Banks } from '~/types';
 
 function Main() {
-  // const [expensesReport, setExpensesReport] = useState<ExpensesReport>({
-  //   total: 0,
-  //   transactions: [],
-  //   from: '',
-  //   to: '',
-  // } as ExpensesReport);
   const [selectedBank, setSelectedBank] = useState<Banks | undefined>(
     undefined
   );
@@ -41,12 +35,10 @@ function Main() {
     const file = files[0];
 
     if (selectedBank === Banks.Revolut) {
-      extractRevolutReportFromCSV(file, report => {
-        console.log('newExpensesReport', report);
+      extractRevolutReportFromCSV(file, revolutTransactions => {
         // setExpensesReport(report);
-        const transactions = formatRevolutTransactionsToGeneralTransactions(
-          report.transactions
-        );
+        const transactions =
+          formatRevolutTransactionsToGeneralTransactions(revolutTransactions);
         setCurrentTransactions(transactions);
         console.log('transactions', transactions);
         setTransactions(transactions);

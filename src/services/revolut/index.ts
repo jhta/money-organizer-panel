@@ -1,4 +1,4 @@
-import { extractDataFromCSV } from '~/utils';
+import { convertDateToTimestamp, extractDataFromCSV } from '~/utils';
 import { Banks, ExpensesReport, Transaction } from '~/types';
 import {
   RevolutTransaction,
@@ -31,29 +31,29 @@ const REVOLUT_TRANSACTIONS_SPECIAL_CASES = {
   amount: (value: string) => value.replace('-', ''),
 };
 
-export const getExpensesReport = (
-  transactions: RevolutTransaction[]
-): ExpensesReport => {
-  const filteredTransactions = filterTransactions(transactions);
-  return {
-    total: getTotal(filteredTransactions),
-    transactions: filteredTransactions,
-    from: filteredTransactions[0].startedDate,
-    to: filteredTransactions[filteredTransactions.length - 1].startedDate,
-  };
-};
+// export const getExpensesReport = (
+//   transactions: RevolutTransaction[]
+// ): ExpensesReport => {
+//   const filteredTransactions = filterTransactions(transactions);
+//   return {
+//     total: getTotal(filteredTransactions),
+//     transactions: filteredTransactions,
+//     from: filteredTransactions[0].startedDate,
+//     to: filteredTransactions[filteredTransactions.length - 1].startedDate,
+//   };
+// };
 
 export const extractRevolutReportFromCSV = (
   file: File,
-  cb: (data: ExpensesReport) => void
+  cb: (data: RevolutTransaction[]) => void
 ): void => {
   extractDataFromCSV<RevolutTransaction>(
     file,
     REVOLUT_TRANSACTIONS_SPECIAL_CASES,
     data => {
-      const newExpensesReport = getExpensesReport(data);
-      cb(newExpensesReport);
-      localStorage.setItem('report', JSON.stringify(newExpensesReport));
+      const filteredTransactions = filterTransactions(data);
+      cb(filteredTransactions);
+      localStorage.setItem('report', JSON.stringify(filterTransactions));
     }
   );
 };
@@ -67,7 +67,7 @@ export const formatRevolutTransactionsToGeneralTransactions = (
     description: transaction.description,
     category: transaction.category,
     fullDescription: transaction.description,
-    date: transaction.startedDate,
+    date: convertDateToTimestamp(transaction.startedDate),
     bank: Banks.Revolut,
   }));
 };

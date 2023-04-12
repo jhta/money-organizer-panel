@@ -1,13 +1,14 @@
-import { Banks, Categories, Transaction } from '~/types';
+import { Banks, Transaction } from '~/types';
 import { v4 } from 'uuid';
+import { convertDateToTimestamp } from '~/utils';
 
 interface AbnAmroTransaction {
   id: string;
   currency: string;
-  initialDate: string;
+  initialDate: number;
   balancePrevious: string;
   balanceAfter: string;
-  endDate: string;
+  endDate: number;
   amount: string;
   description: string;
   fullDescription: string;
@@ -55,7 +56,12 @@ function formatDate(date = '') {
   const month = date.slice(4, 6);
   const day = date.slice(6, 8);
 
-  return `${year}-${month}-${day}`;
+  return convertDateToTimestamp(`${year}-${month}-${day}`);
+}
+
+function formatAmount(amount = '0') {
+  const asNumber = Number(amount.replace(',', '.'));
+  return (asNumber * -1).toString();
 }
 
 export function extractDataFromTxt(
@@ -71,8 +77,8 @@ export function extractDataFromTxt(
       // this will then display a text file
       const lines = (reader.result as string).split(/\r?\n/);
 
-      const data = lines
-        .map(line => {
+      const data = lines.reduce(
+        (acc: AbnAmroTransaction[], line: string): AbnAmroTransaction[] => {
           const [
             id,
             currency,
@@ -84,19 +90,25 @@ export function extractDataFromTxt(
             description,
           ] = line.split('\t');
 
-          return {
-            id: id ? `${id}-${initialDate}-${amount}-${v4()}` : undefined,
-            currency,
-            initialDate: formatDate(initialDate),
-            balancePrevious,
-            balanceAfter,
-            endDate: formatDate(endDate),
-            amount: amount ? amount.replace(',', '.') : undefined,
-            description: formatDescription(description),
-            fullDescription: description,
-          };
-        })
-        .filter(item => item.id);
+          if (!id) return acc;
+
+          return [
+            ...acc,
+            {
+              id: `${id}-${initialDate}-${amount}-${v4()}`,
+              currency,
+              initialDate: formatDate(initialDate),
+              balancePrevious,
+              balanceAfter,
+              endDate: formatDate(endDate),
+              amount: formatAmount(amount),
+              description: formatDescription(description),
+              fullDescription: description,
+            },
+          ];
+        },
+        []
+      );
       cb(data);
     },
     false

@@ -45,7 +45,7 @@ export const SelectableList: FC<SelectableListProps> = ({ transactions }) => {
   return (
     <ul className="transactionList">
       {transactions.map(transaction => (
-        <SelectableListItem transaction={transaction} />
+        <SelectableListItem key={transaction.id} transaction={transaction} />
       ))}
     </ul>
   );

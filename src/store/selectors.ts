@@ -1,3 +1,4 @@
+import { ExpensesReport } from '~/types';
 import { AppState } from './reducer';
 
 export const calculateTotal = (transactions: AppState['transactions']) =>
@@ -34,3 +35,16 @@ export const selectSelectedTransactionTotal = (state: AppState) =>
 
 export const selectHasAllTransactionSelectedCategory = (state: AppState) =>
   selectSelectedTransactions(state).every(transaction => transaction.category);
+
+export const selectFirstSelectedTransactionDate = (state: AppState) =>
+  state.selectedTransactions[0]?.date;
+
+export const selectLastSelectedTransactionDate = (state: AppState) =>
+  state.selectedTransactions[state.selectedTransactions.length - 1]?.date;
+
+export const selectReport = (state: AppState): ExpensesReport => ({
+  total: selectSelectedTransactionTotal(state),
+  transactions: selectSelectedTransactions(state),
+  from: selectFirstTransactionDate(state),
+  to: selectLastTransactionDate(state),
+});

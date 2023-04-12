@@ -1,10 +1,8 @@
-import { RevolutTransaction } from './services/revolut/types';
-
 export interface Transaction {
   id: string;
   category?: Categories;
   amount: string;
-  date: string;
+  date: number;
   description: string;
   fullDescription?: string;
   bank: Banks;
@@ -12,7 +10,7 @@ export interface Transaction {
 
 export interface ExpensesReport {
   total: number;
-  transactions: RevolutTransaction[];
+  transactions: Transaction[];
   from: string;
   to: string;
 }

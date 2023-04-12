@@ -1,15 +1,17 @@
 import { parse } from 'papaparse';
 import camelcase from 'lodash.camelcase';
 import { format } from 'date-fns';
-import { loadingMessageCSS } from 'react-select/dist/declarations/src/components/Menu';
 
-export function formatDate(date: string) {
+export function formatDate(date: string | number) {
   return format(new Date(date), 'MMM, dd yyyy');
 }
 
 export function formatAmountToEuro(amount: string | number) {
   return `${Math.round(Number(amount) * 100) / 100}€`;
 }
+
+export const convertDateToTimestamp = (date: string) =>
+  new Date(date).getTime();
 
 interface CSVFormatterSpecialCases {
   [key: string]: (value: string) => string;
