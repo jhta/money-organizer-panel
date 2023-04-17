@@ -1,0 +1,24 @@
+.report-list {
+  list-style: none;
+}
+
+.report-list-item {
+  margin-bottom: 1em;
+  border: 2px solid #fff;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.report-list-item:hover {
+  background-color: #383838;
+}
+
+.report-list-item h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-left: 1rem;
+}

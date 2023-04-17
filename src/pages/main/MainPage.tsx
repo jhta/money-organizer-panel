@@ -1,95 +1,42 @@
-import React, { useState } from 'react';
 import chicken from '~/assets/chicken.svg';
-import revolutLogo from '~/assets/revolut.png';
-import abnAmroLogo from '~/assets/abn-amro-logo.png';
-import { Transaction } from '~/types';
 import { TransactionList } from '~/components/TransactionList';
-import {
-  extractRevolutReportFromCSV,
-  formatRevolutTransactionsToGeneralTransactions,
-} from '~/services/revolut';
-import { useActions } from '~/store/useActions';
-import './styles.css';
-import { FileImporter } from '~/components/FileImporter/FileImporter';
-import {
-  extractDataFromTxt,
-  formatAbnAmroTransactionsToGeneralTransactions,
-} from '~/services/abm-amro/AbnAmroService';
 import { Banks } from '~/types';
+import { ClickableLogo } from '~/components/ClickableLogo/ClickableLogo';
+import {
+  useIsReportCompleted,
+  useIsReportStarted,
+  usePlainTransactions,
+} from '~/store/useSelectors';
+import './styles.css';
+import { useNavigate } from 'react-router-dom';
+import { Routes } from '~/routing/Routes';
 
 function Main() {
-  const [selectedBank, setSelectedBank] = useState<Banks | undefined>(
-    undefined
-  );
-  const [currentTransactions, setCurrentTransactions] = useState<Transaction[]>(
-    []
-  );
-
-  const { setTransactions } = useActions();
-
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files = [] } = event.target;
-
-    if (!files?.length) return;
-
-    const file = files[0];
-
-    if (selectedBank === Banks.Revolut) {
-      extractRevolutReportFromCSV(file, revolutTransactions => {
-        // setExpensesReport(report);
-        const transactions =
-          formatRevolutTransactionsToGeneralTransactions(revolutTransactions);
-        setCurrentTransactions(transactions);
-        console.log('transactions', transactions);
-        setTransactions(transactions);
-      });
-    } else {
-      extractDataFromTxt(file, report => {
-        console.log('report', report);
-        const transactions =
-          formatAbnAmroTransactionsToGeneralTransactions(report);
-        setCurrentTransactions(transactions);
-        setTransactions(transactions);
-      });
-    }
-  };
-
-  const createOnSelectBank = (bank: Banks) => () => {
-    setSelectedBank(bank);
-  };
+  const transactions = usePlainTransactions();
+  const isReportStarted = useIsReportStarted();
+  const isReportCompleted = useIsReportCompleted();
+  const navigate = useNavigate();
 
   return (
     <div className="App">
       <img src={chicken} alt="chicken" className="chicken chickenSvg" />
       <h1>PolloDiario Panel</h1>
+      {isReportStarted && <h2>Continue with your report:</h2>}
+      {isReportCompleted && <h2>Report completed!</h2>}
       <div className="card">
-        {selectedBank ? (
-          <FileImporter
-            onChange={changeHandler}
-            type={selectedBank === Banks.Revolut ? 'csv' : 'txt'}
-          />
-        ) : (
+        <>
           <div className="clickable-list">
-            <div
-              onClick={createOnSelectBank(Banks.Revolut)}
-              className="clickable-logo"
-            >
-              <img src={revolutLogo} alt="revolut" className="revolutLogo" />
-            </div>
-            <div
-              onClick={createOnSelectBank(Banks.AbnAmro)}
-              className="clickable-logo"
-            >
-              <img
-                src={abnAmroLogo}
-                width="200"
-                alt="revolut"
-                className="revolutLogo"
-              />
-            </div>
+            <ClickableLogo bank={Banks.Revolut} />
+            <ClickableLogo bank={Banks.AbnAmro} />
           </div>
-        )}
-        <TransactionList transactions={currentTransactions} />
+        </>
+
+        <div>
+          <button onClick={() => navigate(Routes.Reports)}>
+            Go to reports
+          </button>
+        </div>
+        <TransactionList transactions={transactions} />
       </div>
     </div>
   );

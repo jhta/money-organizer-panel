@@ -1,4 +1,4 @@
-import { Categories, Transaction } from '~/types';
+import { Banks, Categories, Transaction } from '~/types';
 
 export enum ActionTypes {
   SET_TRANSACTIONS = 'SET_TRANSACTIONS',
@@ -6,6 +6,9 @@ export enum ActionTypes {
   ADD_SELECTED_TRANSACTION = 'ADD_SELECTED_TRANSACTION',
   REMOVE_SELECTED_TRANSACTION = 'REMOVE_SELECTED_TRANSACTION',
   SET_CATEGORY_TO_TRANSACTION = 'SET_CATEGORY_TO_TRANSACTION',
+  UPDATE_REPORT = 'UPDATE_REPORT',
+  START_REPORT = 'START_REPORT',
+  COMPLETE_REPORT = 'COMPLETE_REPORT',
 }
 
 type Action<Payload = undefined> = {
@@ -15,28 +18,47 @@ type Action<Payload = undefined> = {
 
 interface SetTransactionsAction extends Action<Transaction[]> {
   type: ActionTypes.SET_TRANSACTIONS;
-  payload: Transaction[];
 }
 
 interface SetSelectedTransactionsAction extends Action<Transaction[]> {
   type: ActionTypes.SET_SELECTED_TRANSACTIONS;
-  payload: Transaction[];
 }
 
 interface AddSelectedTransactionAction extends Action<Transaction> {
   type: ActionTypes.ADD_SELECTED_TRANSACTION;
-  payload: Transaction;
 }
 
 interface RemoveSelectedTransactionAction extends Action<string> {
   type: ActionTypes.REMOVE_SELECTED_TRANSACTION;
-  payload: string;
 }
 
 interface SetCategoryToTransactionAction
   extends Action<{ id: string; category: Categories }> {
   type: ActionTypes.SET_CATEGORY_TO_TRANSACTION;
-  payload: { id: string; category: Categories };
+}
+
+interface UpdateReportActionPayload {
+  from: number;
+  to: number;
+  transactions: Transaction[];
+  total: number;
+  state: {
+    started: boolean;
+    completed: boolean;
+    banks: Banks[];
+  };
+}
+
+interface UpdateReportAction extends Action<UpdateReportActionPayload> {
+  type: ActionTypes.UPDATE_REPORT;
+}
+
+interface StartReport extends Action {
+  type: ActionTypes.START_REPORT;
+}
+
+interface CompleteReport extends Action {
+  type: ActionTypes.COMPLETE_REPORT;
 }
 
 export type Actions =
@@ -44,7 +66,10 @@ export type Actions =
   | SetSelectedTransactionsAction
   | AddSelectedTransactionAction
   | RemoveSelectedTransactionAction
-  | SetCategoryToTransactionAction;
+  | SetCategoryToTransactionAction
+  | UpdateReportAction
+  | StartReport
+  | CompleteReport;
 
 export const actions = {
   setTransactions: (transactions: Transaction[]): SetTransactionsAction => ({
@@ -73,5 +98,17 @@ export const actions = {
   ): SetCategoryToTransactionAction => ({
     type: ActionTypes.SET_CATEGORY_TO_TRANSACTION,
     payload: { id, category },
+  }),
+  updateReport: (report: UpdateReportActionPayload): UpdateReportAction => ({
+    type: ActionTypes.UPDATE_REPORT,
+    payload: report,
+  }),
+  startReport: (): StartReport => ({
+    type: ActionTypes.START_REPORT,
+    payload: undefined,
+  }),
+  completeReport: (): CompleteReport => ({
+    type: ActionTypes.COMPLETE_REPORT,
+    payload: undefined,
   }),
 };

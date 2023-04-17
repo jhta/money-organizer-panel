@@ -11,6 +11,10 @@ import {
   selectSelectedTransactions,
   selectHasAllTransactionSelectedCategory,
   selectReport,
+  selectIsReportStarted,
+  selectIsReportCompleted,
+  selectReportBanks,
+  selectCurrentBank,
 } from './selectors';
 
 type Selector<S> = (state: S) => any;
@@ -61,4 +65,20 @@ export function useReport() {
 
 export function useHasAllSelectedTransactionsCategory() {
   return useSelect(selectHasAllTransactionSelectedCategory);
+}
+
+export function useIsReportStarted() {
+  return useSelect(selectIsReportStarted);
+}
+
+export function useIsReportCompleted() {
+  return useSelect(selectIsReportCompleted);
+}
+
+export function useReportBanks() {
+  return useSelect(selectReportBanks);
+}
+
+export function useCurrentBank() {
+  return useSelect(selectCurrentBank);
 }

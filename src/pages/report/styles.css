@@ -1,0 +1,16 @@
+.report-transaction {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border: 1px solid #696868;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

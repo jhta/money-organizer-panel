@@ -1,0 +1,17 @@
+.login-google {
+  background: #dd4b39;
+  width: 300px;
+  padding: 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+.login-google:hover {
+  background: #c43e2f;
+}
+
+.login-google label {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 500;
+}

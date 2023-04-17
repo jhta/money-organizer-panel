@@ -2,17 +2,14 @@ import { RouterProvider } from 'react-router-dom';
 import './App.css';
 import { Store } from './store';
 import { router } from './routing/router';
-import { useEffect } from 'react';
-import firebaseService from './services/firebase/firebaseService';
+import { AuthProvider } from './services/auth/AuthProvider';
 
 function App() {
-  useEffect(() => {
-    firebaseService.init();
-  }, []);
-
   return (
     <Store>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </Store>
   );
 }

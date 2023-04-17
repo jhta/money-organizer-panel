@@ -48,3 +48,13 @@ export const selectReport = (state: AppState): ExpensesReport => ({
   from: selectFirstTransactionDate(state),
   to: selectLastTransactionDate(state),
 });
+
+export const selectIsReportCompleted = (state: AppState) =>
+  state.report.state.completed;
+
+export const selectIsReportStarted = (state: AppState) =>
+  state.report.state.started;
+
+export const selectReportBanks = (state: AppState) => state.report.state.banks;
+
+export const selectCurrentBank = (state: AppState) => state.currentBank;

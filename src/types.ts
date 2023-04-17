@@ -9,10 +9,11 @@ export interface Transaction {
 }
 
 export interface ExpensesReport {
+  id?: string;
   total: number;
   transactions: Transaction[];
-  from: string;
-  to: string;
+  from: number;
+  to: number;
 }
 
 export enum Categories {

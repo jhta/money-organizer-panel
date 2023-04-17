@@ -1,11 +1,16 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app';
+import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
   getFirestore,
   Firestore,
   setDoc,
   collection,
   addDoc,
+  query,
+  limit,
+  getDocs,
+  getDoc,
+  doc,
 } from 'firebase/firestore';
 import ENV from '~/env';
 import { ExpensesReport } from '~/types';
@@ -24,15 +29,17 @@ const firebaseConfig = {
   measurementId: ENV.MEASUREMENT_ID,
 };
 
+enum Collections {
+  Reports = 'reports',
+}
+
 export class FirebaseService {
   db?: Firestore;
+  app: FirebaseApp;
 
-  init() {
-    const app = initializeApp(firebaseConfig);
-    console.log('app', app);
-    const db = getFirestore(app);
-    console.log(db, 'db');
-    this.db = db;
+  constructor() {
+    this.app = initializeApp(firebaseConfig);
+    this.db = getFirestore(this.app);
   }
 
   async addReport(report: ExpensesReport) {
@@ -40,9 +47,42 @@ export class FirebaseService {
       throw new Error('Firebase not initialized');
     }
     // await addReport(this.db, report);
-    const docRef = await addDoc(collection(this.db, 'reports'), report);
-    console.log('document');
+    const docRef = await addDoc(
+      collection(this.db, Collections.Reports),
+      report
+    );
+    console.log('document', docRef);
     console.log('Document written with ID: ', docRef.id);
+  }
+
+  async getReports() {
+    if (!this.db) {
+      throw new Error('Firebase not initialized');
+    }
+
+    const q = query(collection(this.db, Collections.Reports), limit(10));
+
+    const querySnapshot = await getDocs(q);
+
+    const reports = querySnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as ExpensesReport)
+    );
+
+    return reports;
+  }
+
+  async getReportById(id: string) {
+    if (!this.db) {
+      throw new Error('Firebase not initialized');
+    }
+
+    const docRef = await getDoc(doc(this.db, Collections.Reports, id));
+    const report = docRef.data() as ExpensesReport;
+    return report;
   }
 }
 

@@ -1,6 +1,7 @@
 import { Categories, Transaction } from '~/types';
 import { useStore } from '.';
 import { actions } from './actions';
+import { TotalReport } from './reducer';
 
 export function useActions() {
   const { dispatch } = useStore();
@@ -16,5 +17,9 @@ export function useActions() {
       dispatch(actions.removeSelectedTransaction(id)),
     setCategoryToTransaction: (id: string, category: Categories) =>
       dispatch(actions.setCategoryToTransaction(id, category)),
+    startReport: () => dispatch(actions.startReport()),
+    completeReport: () => dispatch(actions.completeReport()),
+    updateReport: (report: TotalReport) =>
+      dispatch(actions.updateReport(report)),
   };
 }

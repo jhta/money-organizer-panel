@@ -1,9 +1,25 @@
 import { parse } from 'papaparse';
 import camelcase from 'lodash.camelcase';
 import { format } from 'date-fns';
+import {
+  extractRevolutReportFromCSV,
+  formatRevolutTransactionsToGeneralTransactions,
+} from '~/services/revolut';
+import {
+  extractDataFromTxt,
+  formatAbnAmroTransactionsToGeneralTransactions,
+} from '~/services/abm-amro/AbnAmroService';
+import { Banks, Transaction } from './types';
 
 export function formatDate(date: string | number) {
-  return format(new Date(date), 'MMM, dd yyyy');
+  if (!date) return '';
+  try {
+    const formatted = format(new Date(date), 'MMM, dd yyyy');
+    return formatted;
+  } catch (e) {
+    console.log(e);
+    return '';
+  }
 }
 
 export function formatAmountToEuro(amount: string | number) {
@@ -53,7 +69,6 @@ export function extractDataFromCSV<Data extends Object>(
     header: true,
     skipEmptyLines: true,
     complete: results => {
-      console.log('extracted data', results.data);
       if (!results?.data?.length) return cb([] as Data[]);
 
       const formattedCsvData = formatCsvResult<Data>(
@@ -65,57 +80,24 @@ export function extractDataFromCSV<Data extends Object>(
   });
 }
 
-interface AbnAmroTransaction {
-  id: string;
-  currency: string;
-  initialDate: string;
-  balancePrevious: string;
-  balanceAfter: string;
-  endDate: string;
-  amount: string;
-  description: string;
-}
+export function extractTransactionsFromFile(
+  file: File,
+  bank: Banks,
+  cb: (transactions: Transaction[]) => void
+) {
+  if (bank === Banks.Revolut) {
+    extractRevolutReportFromCSV(file, revolutTransactions => {
+      const transactions =
+        formatRevolutTransactionsToGeneralTransactions(revolutTransactions);
+      cb(transactions);
+    });
 
-export function extractDataFromTxt(
-  txt: File,
-  cb: (data: AbnAmroTransaction[]) => void
-): void {
-  const reader = new FileReader();
+    return;
+  }
+  extractDataFromTxt(file, report => {
+    console.log();
+    const transactions = formatAbnAmroTransactionsToGeneralTransactions(report);
 
-  reader.readAsText(txt);
-  reader.addEventListener(
-    'load',
-    () => {
-      // this will then display a text file
-      const lines = (reader.result as string).split(/\r?\n/);
-
-      const data = lines
-        .map(line => {
-          const [
-            id,
-            currency,
-            initialDate,
-            balancePrevious,
-            balanceAfter,
-            endDate,
-            amount,
-            description,
-          ] = line.split('\t');
-
-          return {
-            id,
-            currency,
-            initialDate,
-            balancePrevious,
-            balanceAfter,
-            endDate,
-            amount,
-            description,
-          };
-        })
-        .filter(item => item.id);
-      cb(data);
-    },
-    false
-  );
+    cb(transactions);
+  });
 }
