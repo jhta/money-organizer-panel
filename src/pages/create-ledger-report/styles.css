@@ -1,0 +1,63 @@
+.report-list {
+  list-style: none;
+}
+
+.report-list-item {
+  margin-bottom: 1em;
+  border: 2px solid #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+.report-list-item:hover {
+  background-color: #383838;
+}
+
+.create-ledger-container {
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  margin-bottom: 2rem;
+}
+
+hr {
+  width: 100%;
+  margin: 1rem 0;
+  background-color: #555;
+  height: 0.2px;
+  border: none;
+}
+
+.input-group {
+  border-radius: 1rem;
+  margin-bottom: 1em;
+  padding: 0.5rem 1rem;
+  display: flex;
+  border: 2px solid #fff;
+}
+
+input[type='text'],
+input[type='number'] {
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  outline: none;
+  font-size: 1rem;
+}
+
+input[type='text'] {
+  width: 200px;
+  padding-left: 8px;
+}
+
+input[type='number'] {
+  width: 100px;
+  padding-right: 8px;
+  border-right: 1px solid #696868;
+}

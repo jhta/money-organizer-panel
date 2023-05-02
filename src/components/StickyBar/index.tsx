@@ -3,6 +3,7 @@ import { ContentForSubmitReport } from './components/ContentForSubmitReport';
 import { ContentForMain } from './components/ContentForMain';
 import {
   useCurrentBank,
+  useCurrentReport,
   useHasAllSelectedTransactionsCategory,
   useHasTransactions,
   useReport,
@@ -13,6 +14,8 @@ import './styles.css';
 import firebaseService from '~/services/firebase/firebaseService';
 import { useActions } from '~/store/useActions';
 import { Banks } from '~/types';
+import { mixReports } from '~/utils';
+import { useAlert } from 'react-alert';
 
 const areArrayEqual = (a: any[], b: any[]) => {
   if (a.length !== b.length) return false;
@@ -36,9 +39,11 @@ function useButtonByRoute() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const report = useReport();
+  const currentReport = useCurrentReport();
   const { updateReport } = useActions();
   const reportBanks = useReportBanks();
   const currentBank = useCurrentBank() as Banks;
+  const alert = useAlert();
 
   const text = BUTTON_TEXT_BY_ROUTE[pathname] || '';
 
@@ -52,13 +57,10 @@ function useButtonByRoute() {
         break;
       case Routes.AddCategories:
         const banks = [...reportBanks, currentBank];
-
         const isCompleted = areArrayEqual(banks.sort(), FULL_BANKS.sort());
-        console.log('banks', banks);
-        console.log({ isCompleted });
 
         updateReport({
-          ...report,
+          ...currentReport,
           state: {
             completed: isCompleted,
             started: !isCompleted,
@@ -66,8 +68,13 @@ function useButtonByRoute() {
           },
         });
 
-        console.log('isCompleted', isCompleted);
-        alert('Report submitted');
+        if (isCompleted) {
+          const mixedReport = mixReports(report, currentReport);
+          console.log('full report', mixedReport);
+          alert.success('Report submitted');
+          firebaseService.addReport(mixedReport);
+        }
+
         navigate(Routes.Main);
         break;
 

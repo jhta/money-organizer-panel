@@ -7,6 +7,7 @@ export enum RevolutTransactionTypes {
   'TRANSFER' = 'TRANSFER',
   'EXCHANGE' = 'EXCHANGE',
   'FEE' = 'FEE',
+  'ATM' = 'ATM',
 }
 
 export interface RevolutTransaction {

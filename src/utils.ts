@@ -9,7 +9,8 @@ import {
   extractDataFromTxt,
   formatAbnAmroTransactionsToGeneralTransactions,
 } from '~/services/abm-amro/AbnAmroService';
-import { Banks, Transaction } from './types';
+import { Banks, Categories, ExpensesReport, Transaction } from './types';
+import { TotalReport } from './store/reducer';
 
 export function formatDate(date: string | number) {
   if (!date) return '';
@@ -101,3 +102,59 @@ export function extractTransactionsFromFile(
     cb(transactions);
   });
 }
+
+const KNOWN_CATEGORIES_MAP = {
+  'albert heijn': Categories.GROCERIES,
+  jumbo: Categories.GROCERIES,
+  dirk: Categories.GROCERIES,
+  lidl: Categories.GROCERIES,
+  action: Categories.GROCERIES,
+  spar: Categories.GROCERIES,
+  booking: Categories.TRAVEL,
+  airbnb: Categories.TRAVEL,
+  uber: Categories.TRANSPORT,
+  ns: Categories.TRANSPORT,
+  waternet: Categories.HOUSEHOLD,
+  'budget energie': Categories.HOUSEHOLD,
+  transavia: Categories.TRAVEL,
+  klm: Categories.TRAVEL,
+  easyjet: Categories.TRAVEL,
+  cafe: Categories.RESTAURANTS_AND_COFFEE,
+  coffee: Categories.RESTAURANTS_AND_COFFEE,
+  restaurant: Categories.RESTAURANTS_AND_COFFEE,
+};
+
+const knownCategories = Object.keys(
+  KNOWN_CATEGORIES_MAP
+) as (keyof typeof KNOWN_CATEGORIES_MAP)[];
+
+export const getKnownCategory = (description = '') => {
+  const lowerCaseDescription = description.toLowerCase();
+
+  const categoryKey = knownCategories.find(category =>
+    lowerCaseDescription.includes(category)
+  );
+
+  if (!categoryKey) return undefined;
+
+  return KNOWN_CATEGORIES_MAP[categoryKey];
+};
+
+export const calculateTotal = (transactions: Transaction[]): number =>
+  transactions.reduce(
+    (acc, transaction) => acc + Number(transaction.amount),
+    0
+  );
+
+export const mixReports = (
+  report: ExpensesReport,
+  newReport: ExpensesReport
+): ExpensesReport => {
+  const transactions = [...report.transactions, ...newReport.transactions];
+  return {
+    total: report.total + newReport.total,
+    from: transactions[0].date,
+    to: transactions[transactions.length - 1].date,
+    transactions: [...report.transactions, ...newReport.transactions],
+  };
+};

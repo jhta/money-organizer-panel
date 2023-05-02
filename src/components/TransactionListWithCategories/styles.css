@@ -16,6 +16,12 @@
   padding-bottom: 0.25rem;
 }
 
+.category {
+  margin-right: 1.5rem;
+  border-left: 1px solid #696868;
+  padding-left: 1rem;
+}
+
 .selected {
   border: 2px solid #2eac2e;
   background: rgb(150 238 150 / 15%);

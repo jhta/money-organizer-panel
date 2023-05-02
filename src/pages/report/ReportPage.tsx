@@ -16,6 +16,7 @@ export const ReportItem: FC<ReportItemProps> = ({ transaction }) => {
       <p>{formatDate(transaction.date)}</p>
       <p>{transaction.description}</p>
       <p>{transaction.category}</p>
+      <p>{transaction.bank}</p>
       <p>{formatAmountToEuro(transaction.amount)}</p>
     </li>
   );
@@ -33,7 +34,11 @@ export function ReportPage() {
 
       const report = await firebaseService.getReportById(id);
 
-      setReport(report);
+      const formattedReport = {
+        ...report,
+        transactions: report.transactions.sort((a, b) => a.date - b.date),
+      };
+      setReport(formattedReport);
     };
 
     fetchReport().catch(console.error);

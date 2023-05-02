@@ -11,9 +11,16 @@ import {
   getDocs,
   getDoc,
   doc,
+  orderBy,
+  writeBatch,
 } from 'firebase/firestore';
 import ENV from '~/env';
-import { ExpensesReport } from '~/types';
+import {
+  ExpensesReport,
+  LedgerReport,
+  LedgerTransaction,
+  LedgerTransactionCategories,
+} from '~/types';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -31,10 +38,12 @@ const firebaseConfig = {
 
 enum Collections {
   Reports = 'reports',
+  LedgerTransactions = 'ledger_transactions',
+  LedgerReport = 'ledger_report',
 }
 
 export class FirebaseService {
-  db?: Firestore;
+  db: Firestore;
   app: FirebaseApp;
 
   constructor() {
@@ -43,10 +52,6 @@ export class FirebaseService {
   }
 
   async addReport(report: ExpensesReport) {
-    if (!this.db) {
-      throw new Error('Firebase not initialized');
-    }
-    // await addReport(this.db, report);
     const docRef = await addDoc(
       collection(this.db, Collections.Reports),
       report
@@ -56,11 +61,11 @@ export class FirebaseService {
   }
 
   async getReports() {
-    if (!this.db) {
-      throw new Error('Firebase not initialized');
-    }
-
-    const q = query(collection(this.db, Collections.Reports), limit(10));
+    const q = query(
+      collection(this.db, Collections.Reports),
+      orderBy('from'),
+      limit(10)
+    );
 
     const querySnapshot = await getDocs(q);
 
@@ -76,13 +81,64 @@ export class FirebaseService {
   }
 
   async getReportById(id: string) {
-    if (!this.db) {
-      throw new Error('Firebase not initialized');
-    }
-
     const docRef = await getDoc(doc(this.db, Collections.Reports, id));
     const report = docRef.data() as ExpensesReport;
     return report;
+  }
+
+  async addLedgerTransactions(ledgerTransactions: LedgerTransaction[]) {
+    let batch = writeBatch(this.db);
+    ledgerTransactions.forEach(ledgerTransaction => {
+      const docRef = doc(
+        collection(this.db as Firestore, Collections.LedgerTransactions)
+      );
+      batch.set(docRef, ledgerTransaction);
+
+      if (
+        ledgerTransaction.category ===
+        LedgerTransactionCategories.SHARED_EXPENSES
+      ) {
+        const updateDocRef = doc(
+          collection(
+            this.db as Firestore,
+            Collections.Reports,
+            ledgerTransaction.id
+          )
+        );
+        batch.update(updateDocRef, { inLedger: true });
+      }
+    });
+
+    await batch.commit();
+  }
+
+  async getLedgerTransactions() {
+    const q = query(
+      collection(this.db, Collections.LedgerTransactions),
+      orderBy('date')
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const ledgerTransactions = querySnapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as LedgerTransaction)
+    );
+
+    return ledgerTransactions;
+  }
+
+  async createLedgerReport(ledgerReport: LedgerReport) {
+    const docRef = await addDoc(
+      collection(this.db, Collections.LedgerReport),
+      ledgerReport
+    );
+
+    console.log('Document written with ID: ', docRef.id);
+    console.log('report', docRef);
   }
 }
 

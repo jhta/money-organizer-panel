@@ -1,44 +1,14 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Transaction, Categories } from '~/types';
 import { formatAmountToEuro } from '~/utils';
-import Select, { StylesConfig } from 'react-select';
 import './styles.css';
 import { useActions } from '~/store/useActions';
+import { InputSelect } from '../InputSelect/InputSelect';
 
 const options = Object.entries(Categories).map(([key, value]) => ({
-  value: key,
+  value: value,
   label: value,
 }));
-
-const selectStyles: StylesConfig = {
-  control: styles => ({
-    ...styles,
-    width: 200,
-    borderColor: 'transparent',
-    borderWidth: 1,
-    borderLeftColor: '#696868',
-    height: '100%',
-    backgroundColor: 'transparent',
-  }),
-  placeholder: styles => ({
-    ...styles,
-    fontSize: '1rem',
-    margin: '0.5rem',
-  }),
-  option: styles => ({
-    ...styles,
-    backgroundColor: '#242424',
-  }),
-  singleValue: styles => ({
-    ...styles,
-    color: 'white',
-  }),
-  input: styles => ({
-    ...styles,
-    border: 'transparent',
-  }),
-};
-
 interface TransactionListWithCategoriesProps {
   transactions: Transaction[];
 }
@@ -51,7 +21,15 @@ export const TransactionListWithCategoriesItem: FC<
   TransactionListWithCategoriesItemProps
 > = ({ transaction }) => {
   const [value, setValue] = useState<string | undefined>(transaction.category);
+  const [loadedWithCategory, setLoadedWithCategory] = useState(false);
   const { setCategoryToTransaction } = useActions();
+  const selectedOption = options.find(option => option.value === value);
+
+  useEffect(() => {
+    if (transaction.category) {
+      setLoadedWithCategory(true);
+    }
+  }, []);
 
   const onChangeCategorySelected = (newValue: unknown) => {
     const { value } = newValue as { value: Categories; label: string };
@@ -60,20 +38,20 @@ export const TransactionListWithCategoriesItem: FC<
   };
 
   return (
-    <li
-      className={`transaction-wrapper ${!!value && 'selected'}`}
-      key={transaction.date}
-    >
+    <li className={`transaction-wrapper ${!!value && 'selected'}`}>
       <div className="transaction-with-category">
         <p>{transaction.description}</p>
         <p>{formatAmountToEuro(transaction.amount)}</p>
       </div>
-      <Select
-        options={options}
-        onChange={onChangeCategorySelected}
-        styles={selectStyles}
-        defaultInputValue={value}
-      />
+      {loadedWithCategory ? (
+        <p className="category">{value}</p>
+      ) : (
+        <InputSelect
+          options={options}
+          onChange={onChangeCategorySelected}
+          defaultInputValue={selectedOption?.label}
+        />
+      )}
     </li>
   );
 };
@@ -84,7 +62,10 @@ export const TransactionListWithCategories: FC<
   return (
     <ul className="transactionList">
       {transactions.map(transaction => (
-        <TransactionListWithCategoriesItem transaction={transaction} />
+        <TransactionListWithCategoriesItem
+          key={transaction.date}
+          transaction={transaction}
+        />
       ))}
     </ul>
   );

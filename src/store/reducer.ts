@@ -1,5 +1,6 @@
 import { ActionTypes, Actions } from './actions';
 import { Transaction, Banks } from '~/types';
+import { calculateTotal } from '~/utils';
 
 export interface TotalReport {
   total: number;
@@ -36,12 +37,6 @@ export const initialState: AppState = {
     },
   },
 };
-
-const calculateTotal = (transactions: Transaction[]): number =>
-  transactions.reduce(
-    (acc, transaction) => acc + Number(transaction.amount),
-    0
-  );
 
 export const reducer = (state: AppState, action: Actions): AppState => {
   switch (action.type) {
@@ -114,26 +109,20 @@ export const reducer = (state: AppState, action: Actions): AppState => {
       };
 
     case ActionTypes.UPDATE_REPORT:
+      console.log('UPDATE_REPORT', action.payload);
+      const transactions = [
+        ...state.report.transactions,
+        ...action.payload.transactions,
+      ];
       return {
         ...state,
         ...initialState,
         report: {
-          ...action.payload,
-          ...state.report,
           state: action.payload.state,
-          transactions: [
-            ...state.report.transactions,
-            ...action.payload.transactions,
-          ],
+          transactions,
           total: state.report.total + action.payload.total,
-          from:
-            new Date(action.payload.from) < new Date(state.report.from)
-              ? state.report.from
-              : action.payload.from,
-          to:
-            new Date(action.payload.to) > new Date(state.report.to)
-              ? state.report.to
-              : action.payload.to,
+          from: transactions[0].date,
+          to: transactions[transactions.length - 1].date,
         },
       };
 

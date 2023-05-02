@@ -1,9 +1,18 @@
-import { convertDateToTimestamp, extractDataFromCSV } from '~/utils';
-import { Banks, ExpensesReport, Transaction } from '~/types';
+import {
+  convertDateToTimestamp,
+  extractDataFromCSV,
+  getKnownCategory,
+} from '~/utils';
+import { Banks, Transaction } from '~/types';
 import {
   RevolutTransaction,
   RevolutTransactionTypes,
 } from '~/services/revolut/types';
+
+const ACCEPTABLE_TRANSACTION_TYPES = [
+  RevolutTransactionTypes.CARD_PAYMENT,
+  RevolutTransactionTypes.ATM,
+];
 
 const filterTransactions = (
   transactions: RevolutTransaction[]
@@ -11,7 +20,7 @@ const filterTransactions = (
   transactions
     .filter(
       item =>
-        item.type === RevolutTransactionTypes.CARD_PAYMENT &&
+        ACCEPTABLE_TRANSACTION_TYPES.includes(item.type) &&
         item.amount !== '0.00'
     )
     .map(item => ({
@@ -21,27 +30,9 @@ const filterTransactions = (
       }`,
     }));
 
-const getTotal = (transactions: RevolutTransaction[]): number =>
-  transactions.reduce(
-    (acc, transaction) => acc + Number(transaction.amount),
-    0
-  );
-
 const REVOLUT_TRANSACTIONS_SPECIAL_CASES = {
   amount: (value: string) => value.replace('-', ''),
 };
-
-// export const getExpensesReport = (
-//   transactions: RevolutTransaction[]
-// ): ExpensesReport => {
-//   const filteredTransactions = filterTransactions(transactions);
-//   return {
-//     total: getTotal(filteredTransactions),
-//     transactions: filteredTransactions,
-//     from: filteredTransactions[0].startedDate,
-//     to: filteredTransactions[filteredTransactions.length - 1].startedDate,
-//   };
-// };
 
 export const extractRevolutReportFromCSV = (
   file: File,
@@ -65,7 +56,7 @@ export const formatRevolutTransactionsToGeneralTransactions = (
     id: transaction.id,
     amount: transaction.amount,
     description: transaction.description,
-    category: transaction.category,
+    category: getKnownCategory(transaction.description),
     fullDescription: transaction.description,
     date: convertDateToTimestamp(transaction.startedDate),
     bank: Banks.Revolut,

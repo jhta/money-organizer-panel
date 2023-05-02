@@ -9,6 +9,8 @@ export enum Routes {
    * should include the parameter 'id' in the path
    */
   Report = '/report',
+  CreateLedger = '/create-ledger',
+  Ledger = '/ledger',
 }
 
 export interface RouteParams {

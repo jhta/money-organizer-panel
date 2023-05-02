@@ -1,6 +1,6 @@
-import { Banks, Transaction } from '~/types';
 import { v4 } from 'uuid';
-import { convertDateToTimestamp } from '~/utils';
+import { Banks, Transaction } from '~/types';
+import { convertDateToTimestamp, getKnownCategory } from '~/utils';
 
 interface AbnAmroTransaction {
   id: string;
@@ -18,7 +18,9 @@ const APPLE_PAY_DESCRIPTIONS = [
   'eCom, Apple Pay',
   'eCom, Betaalpas',
   'GEA, Betaalpas',
+  'BEA, Betaalpas',
   'BEA, Apple Pay',
+  'BEA, Google Pay',
 ];
 
 function formatApplePayDescription(description = ''): string {
@@ -39,6 +41,11 @@ function formatApplePayDescription(description = ''): string {
 }
 
 function formatDescription(description = ''): string {
+  if (description.includes('SEPA Overboeking')) {
+    const [_, name] = description.split('Naam:');
+    return name.trim();
+  }
+
   const [_, name] = description.split('/NAME/');
 
   if (!name) {
@@ -125,5 +132,6 @@ export function formatAbnAmroTransactionsToGeneralTransactions(
     fullDescription: transaction.fullDescription,
     date: transaction.initialDate,
     bank: Banks.AbnAmro,
+    category: getKnownCategory(transaction.description),
   }));
 }

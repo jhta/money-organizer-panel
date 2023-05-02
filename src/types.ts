@@ -31,3 +31,28 @@ export enum Banks {
   Revolut = 'revolut',
   AbnAmro = 'abn-amro',
 }
+
+export enum LedgerTransactionCategories {
+  MORTAGE = 'Mortage',
+  MORTAGE_REPAIMENT = 'Mortage repayment',
+  SHARED_EXPENSES = 'Shared expenses',
+  CAROLINA_REPAYMENT = 'Carolina repayment',
+  OTHER = 'Other',
+}
+
+export interface LedgerTransaction {
+  id: string;
+  category: LedgerTransactionCategories;
+  transactionsReportId?: string;
+  from: number;
+  to: number;
+  total: number;
+  description?: string;
+}
+
+export interface LedgerReport {
+  id: string;
+  from: number;
+  to: number;
+  ledgerTransactions: string[];
+}
