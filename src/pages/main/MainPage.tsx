@@ -35,6 +35,11 @@ function Main() {
           <button onClick={() => navigate(Routes.Reports)}>
             Go to reports
           </button>
+          <button onClick={() => navigate(Routes.CreateLedger)}>
+            Go to create ledger
+          </button>
+
+          <button onClick={() => navigate(Routes.Ledger)}>Go to ledger</button>
         </div>
         <TransactionList transactions={transactions} />
       </div>

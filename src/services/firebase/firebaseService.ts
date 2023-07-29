@@ -3,132 +3,56 @@ import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
   getFirestore,
   Firestore,
-  setDoc,
   collection,
   addDoc,
-  query,
-  limit,
-  getDocs,
-  getDoc,
-  doc,
-  orderBy,
-  writeBatch,
 } from 'firebase/firestore';
-import ENV from '~/env';
 import {
   ExpensesReport,
+  Invoice,
   LedgerReport,
   LedgerTransaction,
-  LedgerTransactionCategories,
 } from '~/types';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: ENV.API_KEY,
-  authDomain: ENV.AUTH_DOMAIN,
-  projectId: ENV.PROJECT_ID,
-  storageBucket: ENV.STORAGE_BUCKET,
-  messagingSenderId: ENV.MESSAGING_SENDER_ID,
-  appId: ENV.APP_ID,
-  measurementId: ENV.MEASUREMENT_ID,
-};
-
-enum Collections {
-  Reports = 'reports',
-  LedgerTransactions = 'ledger_transactions',
-  LedgerReport = 'ledger_report',
-}
+import { Collections } from './Collections';
+import { firebaseConfig } from './config';
+import { InvoicesModel } from './models/InvoicesModel';
+import { LedgerTransactionsModel } from './models/LedgerTransactionsModel';
+import { ReportsModel } from './models/ReportsModel';
 
 export class FirebaseService {
   db: Firestore;
   app: FirebaseApp;
+  reports: ReportsModel;
+  ledgerTransactions: LedgerTransactionsModel;
+  invoices: InvoicesModel;
 
   constructor() {
     this.app = initializeApp(firebaseConfig);
     this.db = getFirestore(this.app);
+    this.reports = new ReportsModel(this.db);
+    this.ledgerTransactions = new LedgerTransactionsModel(this.db);
+    this.invoices = new InvoicesModel(this.db);
   }
 
   async addReport(report: ExpensesReport) {
-    const docRef = await addDoc(
-      collection(this.db, Collections.Reports),
-      report
-    );
-    console.log('document', docRef);
-    console.log('Document written with ID: ', docRef.id);
+    await this.reports.addReport(report);
   }
 
   async getReports() {
-    const q = query(
-      collection(this.db, Collections.Reports),
-      orderBy('from'),
-      limit(10)
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    const reports = querySnapshot.docs.map(
-      doc =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as ExpensesReport)
-    );
-
+    const reports = await this.reports.getReports();
     return reports;
   }
 
   async getReportById(id: string) {
-    const docRef = await getDoc(doc(this.db, Collections.Reports, id));
-    const report = docRef.data() as ExpensesReport;
+    const report = await this.reports.getReportById(id);
     return report;
   }
 
   async addLedgerTransactions(ledgerTransactions: LedgerTransaction[]) {
-    let batch = writeBatch(this.db);
-    ledgerTransactions.forEach(ledgerTransaction => {
-      const docRef = doc(
-        collection(this.db as Firestore, Collections.LedgerTransactions)
-      );
-      batch.set(docRef, ledgerTransaction);
-
-      if (
-        ledgerTransaction.category ===
-        LedgerTransactionCategories.SHARED_EXPENSES
-      ) {
-        const updateDocRef = doc(
-          collection(
-            this.db as Firestore,
-            Collections.Reports,
-            ledgerTransaction.id
-          )
-        );
-        batch.update(updateDocRef, { inLedger: true });
-      }
-    });
-
-    await batch.commit();
+    this.ledgerTransactions.addLedgerTransactions(ledgerTransactions);
   }
 
-  async getLedgerTransactions() {
-    const q = query(
-      collection(this.db, Collections.LedgerTransactions),
-      orderBy('date')
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    const ledgerTransactions = querySnapshot.docs.map(
-      doc =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as LedgerTransaction)
-    );
-
-    return ledgerTransactions;
+  getLedgerTransactions() {
+    return this.ledgerTransactions.getLedgerTransactions();
   }
 
   async createLedgerReport(ledgerReport: LedgerReport) {
@@ -139,6 +63,15 @@ export class FirebaseService {
 
     console.log('Document written with ID: ', docRef.id);
     console.log('report', docRef);
+  }
+
+  async getInvoices() {
+    const invoices = await this.invoices.getInvoices();
+    return invoices;
+  }
+
+  async addInvoice(invoice: Invoice) {
+    await this.invoices.addInvoice(invoice);
   }
 }
 

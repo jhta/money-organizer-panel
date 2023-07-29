@@ -61,3 +61,17 @@ input[type='number'] {
   padding-right: 8px;
   border-right: 1px solid #696868;
 }
+
+.selected {
+  border: 4px solid #2eac2e;
+  background: rgb(150 238 150 / 15%);
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  margin-bottom: 2rem;
+}

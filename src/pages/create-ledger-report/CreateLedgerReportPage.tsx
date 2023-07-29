@@ -1,32 +1,60 @@
-import { useEffect, useState } from 'react';
-import Select, { SelectInstance, StylesConfig } from 'react-select';
-import { InputSelect } from '~/components/InputSelect/InputSelect';
-import { RouteParams, Routes } from '~/routing/Routes';
-import { useNavigateWithParams } from '~/routing/utils';
+import { useState } from 'react';
+import { useAlert } from 'react-alert';
 import firebaseService from '~/services/firebase/firebaseService';
-import { ExpensesReport, LedgerTransactionCategories } from '~/types';
-import { formatAmountToEuro, formatDate } from '~/utils';
+import {
+  ExpensesReport,
+  LedgerTransaction,
+  LedgerTransactionCategories,
+} from '~/types';
+import { AddManualReportToLedger } from './components/AddManualReportToLedger';
+import { LedgerReport } from './components/LedgerReport';
+import { useFetchReports } from './hook/useFetchReports';
 import './styles.css';
+import {
+  createExpenseAsLedgerTransaction,
+  createSharedExpensesLedgerTransaction,
+} from './utils';
 
-const options = Object.entries(LedgerTransactionCategories).map(
-  ([key, value]) => ({
-    value: value,
-    label: value,
-  })
-);
+interface Expense {
+  description: string;
+  amount: number;
+  category: LedgerTransactionCategories;
+  date: string;
+}
 
 export function CreateLedgerReportPage() {
-  const [reports, setReports] = useState<ExpensesReport[]>([]);
-  // const navigate = useNavigateWithParams();
+  const reports = useFetchReports();
+  const alert = useAlert();
+  const [ledgerTransactions, setLedgerTransactions] = useState<
+    LedgerTransaction[]
+  >([]);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      const reports = await firebaseService.getReports();
-      setReports(reports);
-    };
+  const [expenses, setExpenses] = useState<Expense[]>([]);
 
-    fetchReports().catch(console.error);
-  }, []);
+  const addExpense = (expense: Expense) => {
+    setExpenses([...expenses, expense]);
+    console.log(expense);
+    const expenseAsLedgerTransaction =
+      createExpenseAsLedgerTransaction(expense);
+
+    setLedgerTransactions([...ledgerTransactions, expenseAsLedgerTransaction]);
+  };
+
+  const createOnClickReport = (report: ExpensesReport) => () => {
+    const reportAsLedgerTransaction =
+      createSharedExpensesLedgerTransaction(report);
+
+    setLedgerTransactions([...ledgerTransactions, reportAsLedgerTransaction]);
+  };
+
+  const onSubmitExpensesToLedger = () => {
+    console.log(ledgerTransactions);
+    firebaseService.addLedgerTransactions(ledgerTransactions);
+    alert.success('Ledger transactions added to ledger');
+  };
+
+  const isReportSelected = (id: string) =>
+    ledgerTransactions.some(tx => tx.transactionsReportId === id);
 
   return (
     <div className="create-ledger-container">
@@ -35,26 +63,18 @@ export function CreateLedgerReportPage() {
       <h2>Reports that are not still on ledger</h2>
       <ul className="report-list">
         {reports.map(report => (
-          <li className="report-list-item" key={report.id}>
-            <p>{`from ${formatDate(report.from)} to ${formatDate(
-              report.to
-            )}:`}</p>
-            <p>
-              <b>{formatAmountToEuro(report.total)}</b>
-            </p>
-          </li>
+          <LedgerReport
+            report={report}
+            onClick={createOnClickReport(report)}
+            isSelected={isReportSelected(report.id || '')}
+          />
         ))}
       </ul>
       <hr />
 
       <h2>Extra expenses to add manually</h2>
-      <div className="input-group">
-        <input type="number" placeholder="1000" />
-        <input type="text" placeholder="repayment...." />
-        <InputSelect options={options} />
-      </div>
-
-      <button>Continue</button>
+      <AddManualReportToLedger expenses={expenses} addExpense={addExpense} />
+      <button onClick={onSubmitExpensesToLedger}>Submit to ledger</button>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { RouteParams, Routes } from '~/routing/Routes';
 import firebaseService from '~/services/firebase/firebaseService';
 import { ExpensesReport, Transaction } from '~/types';
 import { formatAmountToEuro, formatDate } from '~/utils';
+import TransactionPieChart from './components/ReportTransactionsPieChart';
 import './styles.css';
 
 interface ReportItemProps {
@@ -44,6 +45,8 @@ export function ReportPage() {
     fetchReport().catch(console.error);
   }, []);
 
+  console.log(report?.transactions);
+
   if (!report) {
     return (
       <div>
@@ -55,8 +58,10 @@ export function ReportPage() {
   return (
     <div>
       <h1>{`Total expended: ${formatAmountToEuro(report?.total)}`}</h1>
+      <div className="chart-wrapper">
+        <TransactionPieChart transactions={report.transactions} />
+      </div>
       <h3>{`From ${formatDate(report.from)} to ${formatDate(report.to)}`}</h3>
-
       <ul>
         {report.transactions.map(transaction => (
           <ReportItem key={transaction.id} transaction={transaction} />

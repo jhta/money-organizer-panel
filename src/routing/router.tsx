@@ -9,6 +9,7 @@ import { RestrictedScreen } from './RestrictedPage';
 import { Routes, ParamsByRoute } from './Routes';
 import { ReportPage } from '~/pages/report/ReportPage';
 import { CreateLedgerReportPage } from '~/pages/create-ledger-report/CreateLedgerReportPage';
+import { LedgerPage } from '~/pages/ledger/LedgerPage';
 
 const routeWithParams = (route: Routes) => {
   const params = ParamsByRoute[route] as string[] | undefined;
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: Routes.CreateLedger,
         element: <CreateLedgerReportPage />,
+      },
+      {
+        path: Routes.Ledger,
+        element: <LedgerPage />,
       },
     ],
   },

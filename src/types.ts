@@ -14,6 +14,7 @@ export interface ExpensesReport {
   transactions: Transaction[];
   from: number;
   to: number;
+  inLedger?: boolean;
 }
 
 export enum Categories {
@@ -52,7 +53,25 @@ export interface LedgerTransaction {
 
 export interface LedgerReport {
   id: string;
-  from: number;
-  to: number;
-  ledgerTransactions: string[];
+  date: number;
+  total: number;
+  ledgerTransactionIds: string[];
+}
+
+export interface Invoice {
+  ledgerTransactionIds: string[];
+  from: string;
+  to: string;
+  total: number;
+  payment: {
+    paid: boolean;
+    percentages: {
+      carolina: number;
+      jeison: number;
+    };
+    income: {
+      carolina: number;
+      jeison: number;
+    };
+  };
 }
