@@ -36,7 +36,7 @@ export const AddManualReportToLedger: FC<AddManualReportToLedgerProps> = ({
     addExpense(newExpense);
     setDescription('');
     setAmount(0);
-    setCategory('');
+    setCategory(LedgerTransactionCategories.OTHER);
     setDate('2023-01-01');
   };
 
@@ -67,7 +67,11 @@ export const AddManualReportToLedger: FC<AddManualReportToLedgerProps> = ({
         />
         <InputSelect
           options={options}
-          onChange={value => setCategory(value.value)}
+          onChange={value =>
+            setCategory(
+              (value as { value: LedgerTransactionCategories.OTHER }).value
+            )
+          }
         />
       </div>
 

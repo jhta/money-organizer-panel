@@ -18,7 +18,6 @@ interface StoreProps {
 
 export const Store: FC<StoreProps> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  window.state = state;
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

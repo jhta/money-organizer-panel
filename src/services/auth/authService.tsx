@@ -33,8 +33,8 @@ class AuthService {
         const token = credential.accessToken;
         const user = result.user;
 
-        sessionStorage.setItem('session', token);
-        sessionStorage.setItem('user', user);
+        sessionStorage.setItem('session', token || '');
+        sessionStorage.setItem('user', JSON.stringify(user));
 
         return { token, user };
       }
