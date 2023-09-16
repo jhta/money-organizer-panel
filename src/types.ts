@@ -26,6 +26,7 @@ export enum Categories {
   TRAVEL = 'Travel',
   HOUSEHOLD = 'Household',
   OTHER = 'Other',
+  SHOPPING = 'Shopping',
 }
 
 export enum Banks {

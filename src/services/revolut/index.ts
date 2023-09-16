@@ -1,8 +1,5 @@
-import {
-  convertDateToTimestamp,
-  extractDataFromCSV,
-  getKnownCategory,
-} from '~/utils';
+import { convertDateToTimestamp, getKnownCategory } from '~/utils';
+import { extractDataFromCSV } from '~/utils/extractDataFromCSV';
 import { Banks, Transaction } from '~/types';
 import {
   RevolutTransaction,
