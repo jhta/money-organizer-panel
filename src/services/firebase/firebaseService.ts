@@ -42,7 +42,7 @@ export class FirebaseService {
     return reports;
   }
 
-  async getReportById(id: string) {
+  async getReportById(id: string): Promise<ExpensesReport> {
     const report = await this.reports.getReportById(id);
     return report;
   }

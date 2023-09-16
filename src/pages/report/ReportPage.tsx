@@ -1,51 +1,50 @@
-import { FC, useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { RouteParams, Routes } from '~/routing/Routes';
 import firebaseService from '~/services/firebase/firebaseService';
-import { ExpensesReport, Transaction } from '~/types';
+import { Transaction } from '~/types';
 import { formatAmountToEuro, formatDate } from '~/utils';
+import { ReportItem } from './components/ReportItem';
 import TransactionPieChart from './components/ReportTransactionsPieChart';
+import Select from 'react-select';
 import './styles.css';
+import { selectStyles, SortingOptions, SORTING_OPTIONS } from './constants';
 
-interface ReportItemProps {
-  transaction: Transaction;
+function sortTransactions(transactions: Transaction[], option: SortingOptions) {
+  switch (option) {
+    case SortingOptions.DATE_ASC:
+      return transactions.sort((a, b) => a.date - b.date);
+    case SortingOptions.DATE_DESC:
+      return transactions.sort((a, b) => b.date - a.date);
+    case SortingOptions.AMOUNT_ASC:
+      return transactions.sort((a, b) => Number(a.amount) - Number(b.amount));
+    case SortingOptions.AMOUNT_DESC:
+      return transactions.sort((a, b) => Number(b.amount) - Number(a.amount));
+  }
 }
-
-export const ReportItem: FC<ReportItemProps> = ({ transaction }) => {
-  return (
-    <li className="report-transaction" key={transaction.date}>
-      <p>{formatDate(transaction.date)}</p>
-      <p>{transaction.description}</p>
-      <p>{transaction.category}</p>
-      <p>{transaction.bank}</p>
-      <p>{formatAmountToEuro(transaction.amount)}</p>
-    </li>
-  );
-};
 
 export function ReportPage() {
   const { id } = useParams<RouteParams[Routes.Report]>();
-  const [report, setReport] = useState<ExpensesReport | null>(null);
 
-  useEffect(() => {
-    const fetchReport = async () => {
-      if (!id) {
-        throw new Error('No id provided');
-      }
+  const { data: report, isLoading } = useQuery(['reports', id], () =>
+    firebaseService.getReportById(id || '')
+  );
 
-      const report = await firebaseService.getReportById(id);
+  const [sortingOption, setSortingOption] = useState(SortingOptions.DATE_ASC);
 
-      const formattedReport = {
-        ...report,
-        transactions: report.transactions.sort((a, b) => a.date - b.date),
-      };
-      setReport(formattedReport);
-    };
+  const sortedTransactions = sortTransactions(
+    report?.transactions || [],
+    sortingOption
+  );
 
-    fetchReport().catch(console.error);
-  }, []);
-
-  console.log(report?.transactions);
+  if (isLoading) {
+    return (
+      <div>
+        <h1>Is Loading</h1>
+      </div>
+    );
+  }
 
   if (!report) {
     return (
@@ -62,10 +61,23 @@ export function ReportPage() {
         <TransactionPieChart transactions={report.transactions} />
       </div>
       <h3>{`From ${formatDate(report.from)} to ${formatDate(report.to)}`}</h3>
+      <div className="sorting-bar">
+        <label>Sort by:</label>
+        <Select
+          placeholder="..."
+          defaultValue={SORTING_OPTIONS[0]}
+          options={SORTING_OPTIONS}
+          onChange={value =>
+            setSortingOption((value as { value: SortingOptions })?.value)
+          }
+          styles={selectStyles}
+        />
+      </div>
       <ul>
-        {report.transactions.map(transaction => (
-          <ReportItem key={transaction.id} transaction={transaction} />
-        ))}
+        {!!sortedTransactions &&
+          sortedTransactions.map(transaction => (
+            <ReportItem key={transaction.id} transaction={transaction} />
+          ))}
       </ul>
     </div>
   );
