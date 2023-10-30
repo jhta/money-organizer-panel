@@ -5,23 +5,7 @@ import './styles.css';
 import firebaseService from '~/services/firebase/firebaseService';
 import Modal from 'react-modal';
 import { useAlert } from 'react-alert';
-
-export const useFetchLedger = () => {
-  const [ledgerTransactions, setLedgerTransactions] = useState<
-    LedgerTransaction[]
-  >([]);
-
-  useEffect(() => {
-    const fetchLedger = async () => {
-      const newTransactions = await firebaseService.getLedgerTransactions();
-      setLedgerTransactions(newTransactions);
-    };
-
-    fetchLedger().catch(console.error);
-  }, []);
-
-  return ledgerTransactions;
-};
+import { useQuery } from 'react-query';
 
 interface SelectableListProps {
   transactions: LedgerTransaction[];
@@ -111,7 +95,10 @@ const getTo = (transactions: LedgerTransaction[]) => {
 };
 
 export const LedgerPage: FC = () => {
-  const ledgerTransactions = useFetchLedger();
+  const { data: ledgerTransactions = [] } = useQuery('ledger', () =>
+    firebaseService.getLedgerTransactions()
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSelectedTransactions, setCurrentSelectedTransactions] =
     useState<LedgerTransaction[]>([]);
