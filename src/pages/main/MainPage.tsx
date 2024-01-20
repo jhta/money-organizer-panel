@@ -10,12 +10,19 @@ import {
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
 import { Routes } from '~/routing/Routes';
+import { useQuery } from 'react-query';
+import firebaseService from '~/services/firebase/firebaseService';
 
 function Main() {
   const transactions = usePlainTransactions();
   const isReportStarted = useIsReportStarted();
   const isReportCompleted = useIsReportCompleted();
   const navigate = useNavigate();
+  const { data } = useQuery('transactions', () =>
+    firebaseService.getAllTransactionReports()
+  );
+
+  console.log({ data });
 
   return (
     <div className="App">

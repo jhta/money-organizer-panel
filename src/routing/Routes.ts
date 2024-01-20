@@ -11,6 +11,7 @@ export enum Routes {
   Report = '/report',
   CreateLedger = '/create-ledger',
   Ledger = '/ledger',
+  Analytics = '/analytics',
 }
 
 export interface RouteParams {

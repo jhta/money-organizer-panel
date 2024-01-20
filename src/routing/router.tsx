@@ -10,6 +10,7 @@ import { Routes, ParamsByRoute } from './Routes';
 import { ReportPage } from '~/pages/report/ReportPage';
 import { CreateLedgerReportPage } from '~/pages/create-ledger-report/CreateLedgerReportPage';
 import { LedgerPage } from '~/pages/ledger/LedgerPage';
+import { AnalyticsPage } from '~/pages/analytics/AnalyticsPage';
 
 const routeWithParams = (route: Routes) => {
   const params = ParamsByRoute[route] as string[] | undefined;
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
       {
         path: Routes.Ledger,
         element: <LedgerPage />,
+      },
+      {
+        path: Routes.Analytics,
+        element: <AnalyticsPage />,
       },
     ],
   },

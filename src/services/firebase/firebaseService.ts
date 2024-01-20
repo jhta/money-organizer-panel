@@ -47,6 +47,11 @@ export class FirebaseService {
     return report;
   }
 
+  async getAllTransactionReports() {
+    const reports = await this.reports.getAllTransactionReports();
+    return reports;
+  }
+
   async addLedgerTransactions(ledgerTransactions: LedgerTransaction[]) {
     this.ledgerTransactions.addLedgerTransactions(ledgerTransactions);
   }

@@ -10,7 +10,7 @@ import {
   doc,
   orderBy,
 } from 'firebase/firestore';
-import { ExpensesReport } from '~/types';
+import { ExpensesReport, Transaction } from '~/types';
 
 import { Model } from './Model';
 
@@ -46,6 +46,17 @@ export class ReportsModel extends Model {
     );
 
     return reports;
+  }
+
+  public async getAllTransactionReports() {
+    const reports = await this.getReports();
+
+    const transactionReports = reports.reduce(
+      (acc: Transaction[], report) => [...acc, ...report.transactions],
+      []
+    );
+
+    return transactionReports;
   }
 
   public async getReportById(id: string) {
