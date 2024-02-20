@@ -76,3 +76,13 @@ export interface Invoice {
     };
   };
 }
+
+export interface Trip {
+  id: string;
+  name: string;
+  from: string;
+  to: string;
+  date: number;
+  total: number;
+  transactionIds: string[];
+}

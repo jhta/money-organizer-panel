@@ -13,7 +13,7 @@ export function ReportsPage() {
 
   useEffect(() => {
     const fetchReports = async () => {
-      const reports = await firebaseService.getReports();
+      const reports = (await firebaseService.getReports()).reverse();
       setReports(reports);
     };
 

@@ -25,6 +25,12 @@ const KNOWN_CATEGORIES_MAP = {
   'holland&barrett': Categories.HEALTH,
   pathe: Categories.ENTERTAINMENT,
   thuisbezorgd: Categories.RESTAURANTS_AND_COFFEE,
+  crunchyroll: Categories.ENTERTAINMENT,
+  amazon: Categories.SHOPPING,
+  'h&m': Categories.SHOPPING,
+  gamma: Categories.SHOPPING,
+  ikea: Categories.HOUSEHOLD,
+  'basic package': Categories.HOUSEHOLD,
 };
 
 const knownCategories = Object.keys(

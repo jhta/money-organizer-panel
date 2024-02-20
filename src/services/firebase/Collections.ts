@@ -4,4 +4,5 @@ export enum Collections {
   LedgerReport = 'ledger_report',
   Invoices = 'invoices',
   Transactions = 'transactions',
+  Trips = 'trips',
 }

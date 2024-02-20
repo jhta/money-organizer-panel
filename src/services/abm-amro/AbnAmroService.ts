@@ -43,7 +43,7 @@ function formatApplePayDescription(description = ''): string {
 function formatDescription(description = ''): string {
   if (description.includes('SEPA Overboeking')) {
     const [_, name] = description.split('Naam:');
-    return name.trim();
+    return  name ? name.trim() : ''
   }
 
   const [_, name] = description.split('/NAME/');
