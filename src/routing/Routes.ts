@@ -12,12 +12,16 @@ export enum Routes {
   CreateLedger = '/create-ledger',
   Ledger = '/ledger',
   Analytics = '/analytics',
+  AddTrip = '/add-trip',
+  Trip = '/trip',
 }
 
 export interface RouteParams {
   [Routes.Report]: { id: string };
+  [Routes.Trip]: { id: string };
 }
 
 export const ParamsByRoute: Record<string, string[]> = {
   [Routes.Report]: ['id'],
+  [Routes.Trip]: ['id'],
 };

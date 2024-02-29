@@ -11,19 +11,29 @@ const options = Object.entries(Categories).map(([key, value]) => ({
 }));
 interface TransactionListWithCategoriesProps {
   transactions: Transaction[];
+  tripOptions: { value: string; label: string }[];
 }
 
 interface TransactionListWithCategoriesItemProps {
   transaction: Transaction;
+  tripOptions: { value: string; label: string }[];
 }
 
 export const TransactionListWithCategoriesItem: FC<
   TransactionListWithCategoriesItemProps
-> = ({ transaction }) => {
+> = ({ transaction, tripOptions }) => {
   const [value, setValue] = useState<string | undefined>(transaction.category);
   const [loadedWithCategory, setLoadedWithCategory] = useState(false);
-  const { setCategoryToTransaction } = useActions();
+  const {
+    setCategoryToTransaction,
+    setTripToTransaction,
+    removeSelectedTransaction,
+  } = useActions();
   const selectedOption = options.find(option => option.value === value);
+
+  const [trip, setTrip] = useState<string | undefined>(tripOptions[0].value);
+
+  const selectedTrip = tripOptions.find(option => option.value === trip);
 
   useEffect(() => {
     if (transaction.category) {
@@ -31,14 +41,25 @@ export const TransactionListWithCategoriesItem: FC<
     }
   }, []);
 
+  const onChangeTripSelected = (newValue: unknown) => {
+    const { value } = newValue as { value: string; label: string };
+    console.log('value', value);
+    setTrip(value || '');
+    setTripToTransaction(transaction.id, value || '');
+  };
+
   const onChangeCategorySelected = (newValue: unknown) => {
     const { value } = newValue as { value: Categories; label: string };
     setValue(value || '');
     setCategoryToTransaction(transaction.id, value || Categories.OTHER);
   };
 
+  const onPressRemoveTransaction = () => {
+    removeSelectedTransaction(transaction.id);
+  };
+
   return (
-    <li className={`transaction-wrapper ${!!value && 'selected'}`}>
+    <li className={`transaction-wrapper p-2 ${!!value && 'selected'}`}>
       <div className="transaction-with-category">
         <p>{transaction.description}</p>
         <p>{formatAmountToEuro(transaction.amount)}</p>
@@ -52,19 +73,24 @@ export const TransactionListWithCategoriesItem: FC<
           defaultInputValue={selectedOption?.label}
         />
       )}
+      <InputSelect options={tripOptions} onChange={onChangeTripSelected} />
+      <i className="ml-2 mr-2" onClick={onPressRemoveTransaction}>
+        ︎❌
+      </i>
     </li>
   );
 };
 
 export const TransactionListWithCategories: FC<
   TransactionListWithCategoriesProps
-> = ({ transactions }) => {
+> = ({ transactions, tripOptions }) => {
   return (
     <ul className="transactionList">
       {transactions.map(transaction => (
         <TransactionListWithCategoriesItem
           key={transaction.date}
           transaction={transaction}
+          tripOptions={tripOptions}
         />
       ))}
     </ul>

@@ -71,6 +71,19 @@ export const reducer = (state: AppState, action: Actions): AppState => {
         selectedTransactionsTotal: calculateTotal(newSelectedTransactions),
       };
 
+    case ActionTypes.SET_TRIP_TO_TRANSACTION:
+      const selectedTransactionsWithNewTrip = state.selectedTransactions.map(
+        transaction =>
+          transaction.id === action.payload.id
+            ? { ...transaction, tripId: action.payload.tripId }
+            : transaction
+      );
+
+      return {
+        ...state,
+        selectedTransactions: selectedTransactionsWithNewTrip,
+      };
+
     case ActionTypes.SET_CATEGORY_TO_TRANSACTION:
       const selectedTransactionsWithNewCategory =
         state.selectedTransactions.map(transaction =>

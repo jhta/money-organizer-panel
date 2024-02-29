@@ -12,7 +12,6 @@ import { Banks, ExpensesReport, Transaction } from '~/types';
 export function formatDate(date: string | number) {
   if (!date) return '';
   try {
-    console.log('date to format', date);
     const formatted = format(new Date(date), 'MMM, dd yyyy');
     return formatted;
   } catch (e) {

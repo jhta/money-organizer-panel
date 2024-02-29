@@ -6,6 +6,7 @@ export interface Transaction {
   description: string;
   fullDescription?: string;
   bank: Banks;
+  tripId?: string;
 }
 
 export interface ExpensesReport {
@@ -82,7 +83,6 @@ export interface Trip {
   name: string;
   from: string;
   to: string;
-  date: number;
   total: number;
   transactionIds: string[];
 }

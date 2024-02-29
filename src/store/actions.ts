@@ -6,6 +6,7 @@ export enum ActionTypes {
   ADD_SELECTED_TRANSACTION = 'ADD_SELECTED_TRANSACTION',
   REMOVE_SELECTED_TRANSACTION = 'REMOVE_SELECTED_TRANSACTION',
   SET_CATEGORY_TO_TRANSACTION = 'SET_CATEGORY_TO_TRANSACTION',
+  SET_TRIP_TO_TRANSACTION = 'SET_TRIP_TO_TRANSACTION',
   UPDATE_REPORT = 'UPDATE_REPORT',
   START_REPORT = 'START_REPORT',
   COMPLETE_REPORT = 'COMPLETE_REPORT',
@@ -61,6 +62,11 @@ interface CompleteReport extends Action {
   type: ActionTypes.COMPLETE_REPORT;
 }
 
+interface SetTripToTransactionAction
+  extends Action<{ id: string; tripId: string | undefined }> {
+  type: ActionTypes.SET_TRIP_TO_TRANSACTION;
+}
+
 export type Actions =
   | SetTransactionsAction
   | SetSelectedTransactionsAction
@@ -69,7 +75,8 @@ export type Actions =
   | SetCategoryToTransactionAction
   | UpdateReportAction
   | StartReport
-  | CompleteReport;
+  | CompleteReport
+  | SetTripToTransactionAction;
 
 export const actions = {
   setTransactions: (transactions: Transaction[]): SetTransactionsAction => ({
@@ -98,6 +105,13 @@ export const actions = {
   ): SetCategoryToTransactionAction => ({
     type: ActionTypes.SET_CATEGORY_TO_TRANSACTION,
     payload: { id, category },
+  }),
+  setTripToTransaction: (
+    id: string,
+    tripId: string
+  ): SetTripToTransactionAction => ({
+    type: ActionTypes.SET_TRIP_TO_TRANSACTION,
+    payload: { id, tripId },
   }),
   updateReport: (report: UpdateReportActionPayload): UpdateReportAction => ({
     type: ActionTypes.UPDATE_REPORT,

@@ -21,5 +21,7 @@ export function useActions() {
     completeReport: () => dispatch(actions.completeReport()),
     updateReport: (report: TotalReport) =>
       dispatch(actions.updateReport(report)),
+    setTripToTransaction: (id: string, tripId: string) =>
+      dispatch(actions.setTripToTransaction(id, tripId)),
   };
 }

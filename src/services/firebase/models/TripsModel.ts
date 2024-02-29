@@ -25,11 +25,11 @@ export class TripsModel extends Model {
     console.log('Document written with ID: ', docRef.id);
   }
 
-  public async getTrips() {
+  public async getAllTrips() {
     const q = query(
       collection(this.db, this.collection),
       orderBy('from'),
-      limit(10)
+      limit(20)
     );
 
     const querySnapshot = await getDocs(q);
@@ -46,8 +46,10 @@ export class TripsModel extends Model {
   }
 
   public async getTripById(id: string) {
-    const docRef = await getDoc(doc(this.db, this.collection, id));
-    const report = docRef.data() as Trip;
-    return report;
+    // const docRef = await getDoc(doc(this.db, this.collection, id));
+    // const report = docRef.data() as Trip;
+    // return report;
+    const trips = await this.getAllTrips();
+    return trips.find(trip => trip.id === id);
   }
 }

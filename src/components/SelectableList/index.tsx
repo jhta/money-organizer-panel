@@ -31,7 +31,7 @@ export const SelectableListItem: FC<SelectableListItemProps> = ({
   return (
     <li
       onClick={onClick}
-      className={`selectable-transaction ${isSelected ? 'selected' : ''}`}
+      className={`selectable-transaction p-4 ${isSelected ? 'selected' : ''}`}
       key={transaction.date}
     >
       <p>{formatDate(transaction.date)}</p>

@@ -59,9 +59,30 @@ export class ReportsModel extends Model {
     return transactionReports;
   }
 
+  public async getAllTransactionsByTripId(tripId: string) {
+    const reports = await this.getReports();
+
+    const transactionReports = reports.reduce(
+      (acc: Transaction[], report) => [
+        ...acc,
+        ...filterTransactionsByTrip(report.transactions, tripId),
+      ],
+      []
+    );
+
+    return transactionReports;
+  }
+
   public async getReportById(id: string) {
     const docRef = await getDoc(doc(this.db, Collections.Reports, id));
     const report = docRef.data() as ExpensesReport;
     return report;
   }
 }
+
+const filterTransactionsByTrip = (
+  transactions: Transaction[],
+  tripId: string
+) => {
+  return transactions.filter(transaction => transaction.tripId === tripId);
+};

@@ -17,6 +17,7 @@ import { firebaseConfig } from './config';
 import { InvoicesModel } from './models/InvoicesModel';
 import { LedgerTransactionsModel } from './models/LedgerTransactionsModel';
 import { ReportsModel } from './models/ReportsModel';
+import { TripsModel } from './models/TripsModel';
 
 export class FirebaseService {
   db: Firestore;
@@ -24,6 +25,7 @@ export class FirebaseService {
   reports: ReportsModel;
   ledgerTransactions: LedgerTransactionsModel;
   invoices: InvoicesModel;
+  trips: TripsModel;
 
   constructor() {
     this.app = initializeApp(firebaseConfig);
@@ -31,6 +33,7 @@ export class FirebaseService {
     this.reports = new ReportsModel(this.db);
     this.ledgerTransactions = new LedgerTransactionsModel(this.db);
     this.invoices = new InvoicesModel(this.db);
+    this.trips = new TripsModel(this.db);
   }
 
   async addReport(report: ExpensesReport) {
