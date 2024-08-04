@@ -68,15 +68,12 @@ button:focus-visible {
 
 @layer components {
   /* .btn {
-    @apply w-full sm:w-auto rounded-lg border border-transparent px-5 py-4 text-base font-medium font-inherit bg-[#1a1a1a] cursor-pointer transition-colors duration-250 hover:border-white;
+    @apply w-full sm:w-auto rounded-lg border border-transparent px-5 py-4 text-base font-medium font-sans bg-[#1a1a1a] cursor-pointer transition-colors  hover:border-white;
   } */
 
   .btn {
-    @apply w-full sm:w-auto rounded-lg border border-transparent px-5 py-4 text-base font-medium font-sans bg-[#1a1a1a] cursor-pointer transition-colors  hover:border-white;
+    @apply w-full sm:w-auto rounded-lg border border-[#3d3d3d] px-5 py-4 text-base font-medium font-sans bg-[#1a1a1a] cursor-pointer transition-colors hover:border-white;
   }
-  /* .btn {
-    @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors;
-  } */
 
   .card {
     @apply bg-white shadow-md rounded-lg p-6;

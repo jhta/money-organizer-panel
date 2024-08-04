@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import chicken from '~/assets/chicken.svg';
 import { TransactionList } from '~/components/TransactionList';
 import { Banks } from '~/types';
@@ -16,6 +17,13 @@ function Main() {
   const isReportStarted = useIsReportStarted();
   const isReportCompleted = useIsReportCompleted();
   const navigate = useNavigate();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -30,11 +38,10 @@ function Main() {
       )}
       {isReportCompleted && <h2 className="text-xl mb-4">Report completed!</h2>}
       <div>
-        <div className="flex flex-wrap justify-center gap-4 mb-6">
+        <div className="hidden md:flex flex-wrap justify-center gap-4 mb-6">
           <ClickableLogo bank={Banks.Revolut} />
           <ClickableLogo bank={Banks.AbnAmro} />
         </div>
-
         <div className="flex flex-wrap justify-center gap-4 mb-6">
           <button onClick={() => navigate(Routes.Reports)} className="btn">
             Go to reports
