@@ -45,7 +45,7 @@ const TransactionPieChart: React.FC<Props> = ({
   const chartSize = windowWidth < 768 ? 300 : 600;
 
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" height={chartSize + 100}>
       <PieChart>
         <Pie
           dataKey="amount"
