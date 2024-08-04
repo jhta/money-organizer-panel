@@ -1,4 +1,5 @@
 import { StylesConfig } from 'react-select';
+import { Categories } from '~/types';
 
 export const selectStyles: StylesConfig = {
   control: styles => ({
@@ -56,3 +57,8 @@ export const SORTING_OPTIONS = [
     label: 'Amount (Descendent)',
   },
 ];
+
+export const CATEGORY_OPTIONS = Object.values(Categories).map(category => ({
+  value: category,
+  label: category,
+}));

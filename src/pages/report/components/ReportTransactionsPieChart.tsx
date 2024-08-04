@@ -1,12 +1,23 @@
 import React from 'react';
-import { PieChart, Pie, Tooltip, Legend, Cell } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Tooltip,
+  Legend,
+  Cell,
+  ResponsiveContainer,
+} from 'recharts';
 import { Categories, Transaction } from '~/types';
 
 interface Props {
   transactions: Transaction[];
+  windowWidth: number;
 }
 
-const TransactionPieChart: React.FC<Props> = ({ transactions }) => {
+const TransactionPieChart: React.FC<Props> = ({
+  transactions,
+  windowWidth,
+}) => {
   const categoryData = transactions.reduce((data, transaction) => {
     const key = transaction.category || Categories.OTHER;
     if (!data[key]) {
@@ -31,25 +42,31 @@ const TransactionPieChart: React.FC<Props> = ({ transactions }) => {
     '#dbff00',
   ];
 
+  const chartSize = windowWidth < 768 ? 300 : 600;
+
   return (
-    <PieChart width={600} height={600}>
-      <Pie
-        dataKey="amount"
-        isAnimationActive={false}
-        nameKey="category"
-        data={chartData}
-        cx="50%"
-        cy="50%"
-        outerRadius={180}
-        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-      >
-        {chartData.map((entry, index) => (
-          <Cell key={entry.category} fill={COLORS[index % COLORS.length]} />
-        ))}
-      </Pie>
-      <Tooltip />
-      <Legend />
-    </PieChart>
+    <ResponsiveContainer width="100%" height={600}>
+      <PieChart>
+        <Pie
+          dataKey="amount"
+          isAnimationActive={false}
+          nameKey="category"
+          data={chartData}
+          cx="50%"
+          cy="50%"
+          outerRadius={chartSize / 3}
+          label={({ name, percent }) =>
+            `${name} ${(percent * 100).toFixed(0)}%`
+          }
+        >
+          {chartData.map((entry, index) => (
+            <Cell key={entry.category} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
   );
 };
 
