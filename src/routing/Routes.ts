@@ -12,8 +12,9 @@ export enum Routes {
   CreateLedger = '/create-ledger',
   Ledger = '/ledger',
   Analytics = '/analytics',
-  AddTrip = '/add-trip',
+  AddTrip = '/trips/add',
   Trip = '/trip',
+  Trips = '/trips',
 }
 
 export interface RouteParams {

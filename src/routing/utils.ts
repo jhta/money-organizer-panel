@@ -18,8 +18,13 @@ export const useNavigateWithParams = () => {
 
   return <Params extends Record<string, string>>(
     route: Routes,
-    params: Params
+    params?: Params
   ) => {
+    if (!params) {
+      navigate(route);
+      return;
+    }
+
     const routeWithParams = Object.keys(params).reduce(
       (acc: string, param: string) => {
         return `${acc}/${params[param]}`;

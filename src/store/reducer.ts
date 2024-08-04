@@ -42,6 +42,16 @@ export const reducer = (state: AppState, action: Actions): AppState => {
   switch (action.type) {
     case ActionTypes.SET_TRANSACTIONS:
       const transactionsBank = action.payload[0].bank;
+      if (
+        transactionsBank === state.currentBank &&
+        action.payload[0].date !== state.transactions[0].date
+      ) {
+        return {
+          ...state,
+          transactions: [...state.transactions, ...action.payload],
+        };
+      }
+
       return {
         ...state,
         transactions: action.payload,

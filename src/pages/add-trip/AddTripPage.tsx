@@ -1,23 +1,37 @@
-import { FC, useState } from 'react';
+import React, { FC, useState, useMemo } from 'react';
 import { useAlert } from 'react-alert';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { v4 } from 'uuid';
 import firebaseService from '~/services/firebase/firebaseService';
 import { Trip } from '~/types';
 import { useNavigateWithParams } from '~/routing/utils';
 import { RouteParams, Routes } from '~/routing/Routes';
+import { formatAmountToEuro } from '~/utils';
 
-const AddTripPage: FC = () => {
-  const alert = useAlert();
-  const { data: trips } = useQuery('trips', () =>
+// Custom hooks
+const useTrips = () => {
+  const { data: trips, isLoading } = useQuery('trips', () =>
     firebaseService.trips.getAllTrips()
   );
+  const sortedTrips = useMemo(() => {
+    return [...(trips || [])].sort(
+      (a, b) => new Date(b.from).getTime() - new Date(a.from).getTime()
+    );
+  }, [trips]);
+  return { trips: sortedTrips, isLoading };
+};
 
-  const navigate = useNavigateWithParams();
-
+const useAddTrip = () => {
+  const alert = useAlert();
+  const queryClient = useQueryClient();
   const [tripName, setTripName] = useState('');
 
-  const handleAddTrip = () => {
+  const addTrip = async () => {
+    if (!tripName.trim()) {
+      alert.error('Please enter a trip name');
+      return;
+    }
+
     const newTrip: Trip = {
       id: v4(),
       name: tripName,
@@ -26,37 +40,81 @@ const AddTripPage: FC = () => {
       total: 0,
       transactionIds: [],
     };
-    firebaseService.trips.addTrip(newTrip);
-    alert.success(`trip to ${tripName} added`);
+
+    try {
+      await firebaseService.trips.addTrip(newTrip);
+      alert.success(`Trip to ${tripName} added`);
+      setTripName('');
+      queryClient.invalidateQueries('trips');
+    } catch (error) {
+      alert.error('Failed to add trip');
+      console.error('Error adding trip:', error);
+    }
+  };
+
+  return { tripName, setTripName, addTrip };
+};
+
+// Subcomponents
+const AddTripForm: FC<{
+  tripName: string;
+  setTripName: (name: string) => void;
+  addTrip: () => void;
+}> = ({ tripName, setTripName, addTrip }) => (
+  <div className="flex-row mb-4">
+    <input
+      value={tripName}
+      onChange={e => setTripName(e.target.value)}
+      placeholder="name"
+      className="input-group text-base inline mr-2"
+    />
+    <button onClick={addTrip}>Add</button>
+  </div>
+);
+
+const TripList: FC<{ trips: Trip[]; onTripClick: (id: string) => void }> = ({
+  trips,
+  onTripClick,
+}) => (
+  <ul>
+    {trips.map(trip => (
+      <li
+        onClick={() => onTripClick(trip.id)}
+        className="report-list-item"
+        key={trip.id}
+      >
+        <p>{`Trip to ${trip.name}`}</p>
+        <p>{`Total Expended: ${formatAmountToEuro(trip.total)}`}</p>
+        <p>{`From: ${new Date(trip.from).toLocaleDateString()}`}</p>
+      </li>
+    ))}
+  </ul>
+);
+
+// Main component
+const AddTripPage: FC = () => {
+  const navigate = useNavigateWithParams();
+  const { trips, isLoading } = useTrips();
+  const { tripName, setTripName, addTrip } = useAddTrip();
+
+  const handleTripClick = (id: string) => {
+    navigate<RouteParams[Routes.Trip]>(Routes.Trip, { id });
   };
 
   return (
     <>
       <h1 className="mb-6">Add Trips</h1>
-      <div className="flex-row">
-        <input
-          value={tripName}
-          onChange={e => setTripName(e.target.value)}
-          placeholder="name"
-          className="input-group text-base inline mr-2"
-        />
-        <button onClick={handleAddTrip}>Add</button>
-      </div>
+      <AddTripForm
+        tripName={tripName}
+        setTripName={setTripName}
+        addTrip={addTrip}
+      />
 
-      <ul>
-        {(trips || []).map((trip, index) => (
-          <li
-            onClick={() => {
-              navigate<RouteParams[Routes.Trip]>(Routes.Trip, { id: trip.id });
-            }}
-            className="report-list-item"
-            key={index}
-          >
-            <p>{`Trip to ${trip.name}`}</p>
-            <p>{`Total Expended: ${trip.total}`}</p>
-          </li>
-        ))}
-      </ul>
+      {isLoading ? (
+        <p>Loading trips...</p>
+      ) : (
+        <TripList trips={trips} onTripClick={handleTripClick} />
+      )}
     </>
   );
 };

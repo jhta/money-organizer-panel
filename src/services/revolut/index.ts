@@ -20,6 +20,7 @@ const filterTransactions = (
         ACCEPTABLE_TRANSACTION_TYPES.includes(item.type) &&
         item.amount !== '0.00'
     )
+    .filter(item => item.state === 'COMPLETED')
     .map(item => ({
       ...item,
       id: `${item.startedDate.replaceAll(' ', '-')}-${item.type}-${
@@ -39,6 +40,7 @@ export const extractRevolutReportFromCSV = (
     file,
     REVOLUT_TRANSACTIONS_SPECIAL_CASES,
     data => {
+      console.log({ data });
       const filteredTransactions = filterTransactions(data);
       cb(filteredTransactions);
       localStorage.setItem('report', JSON.stringify(filterTransactions));

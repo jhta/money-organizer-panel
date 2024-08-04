@@ -24,10 +24,12 @@ export const ClickableLogo: FC<ClickableLogoProps> = ({ bank }) => {
 
     if (!files?.length) return;
 
-    const file = files[0];
+    // const file = files[0];
 
-    extractTransactionsFromFile(file, bank, transactions => {
-      setTransactions(transactions);
+    Array.from(files || []).forEach(file => {
+      extractTransactionsFromFile(file, bank, transactions => {
+        setTransactions(transactions);
+      });
     });
   };
 
@@ -49,6 +51,7 @@ export const ClickableLogo: FC<ClickableLogoProps> = ({ bank }) => {
         name="file"
         accept={`.${fileType}`}
         onChange={onClickInputFile}
+        multiple
         style={{ display: 'none' }}
       />
       <div

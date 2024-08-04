@@ -1,22 +1,21 @@
 import { RouteParams, Routes } from '~/routing/Routes';
-import { useNavigateWithParams } from '~/routing/utils';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import firebaseService from '~/services/firebase/firebaseService';
 import { ReportItem } from '../report/components/ReportItem';
 import { formatAmountToEuro, formatDate } from '~/utils';
 import TransactionPieChart from '../report/components/ReportTransactionsPieChart';
+import { useEffect } from 'react';
 
 export const TripPage = () => {
-  // const navigate = useNavigateWithParams();
-  //   navigate<RouteParams[Routes.Trip]>(Routes.Trip, { id: '123' });
-
   const { id } = useParams<RouteParams[Routes.Report]>();
-  const { data: transactions = [] } = useQuery('transactions', () =>
-    id ? firebaseService.reports.getAllTransactionsByTripId(id) : []
-  );
-  const { data: trip } = useQuery(['trip', id], () =>
-    firebaseService.trips.getTripById(id || '')
+  const { data: transactions = [], isSuccess: isTransactionsRequestSuccess } =
+    useQuery('transactions', () =>
+      id ? firebaseService.reports.getAllTransactionsByTripId(id) : []
+    );
+  const { data: trip, isSuccess: isTripRequestSuccess } = useQuery(
+    ['trip', id],
+    () => firebaseService.trips.getTripById(id || '')
   );
 
   const total = transactions?.reduce(
@@ -26,8 +25,25 @@ export const TripPage = () => {
 
   const from = transactions[0]?.date;
   const to = transactions[transactions.length - 1]?.date;
+  const refId = trip?.refId;
 
-  console.log({ transactions });
+  useEffect(() => {
+    if (isTransactionsRequestSuccess && isTripRequestSuccess && refId) {
+      const transactionIds = transactions.map(transaction => transaction.id);
+      const tripTotal = transactions?.reduce(
+        (acc, transaction) => acc + Number(transaction.amount),
+        0
+      );
+
+      if (tripTotal !== trip?.total) {
+        firebaseService.trips.addTransactionsToTrip(
+          refId,
+          transactionIds,
+          tripTotal || 0
+        );
+      }
+    }
+  }, [isTransactionsRequestSuccess, isTripRequestSuccess, id, transactions]);
 
   return (
     <div>

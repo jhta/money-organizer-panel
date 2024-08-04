@@ -9,6 +9,7 @@ import {
   getDoc,
   doc,
   orderBy,
+  updateDoc,
 } from 'firebase/firestore';
 import { Trip } from '~/types';
 
@@ -25,6 +26,19 @@ export class TripsModel extends Model {
     console.log('Document written with ID: ', docRef.id);
   }
 
+  public async addTransactionsToTrip(
+    tripId: string,
+    transactionIds: string[],
+    total: number
+  ) {
+    const docRef = doc(this.db, this.collection, tripId);
+
+    await updateDoc(docRef, {
+      total,
+      transactionIds,
+    });
+  }
+
   public async getAllTrips() {
     const q = query(
       collection(this.db, this.collection),
@@ -37,7 +51,7 @@ export class TripsModel extends Model {
     const trips = querySnapshot.docs.map(
       doc =>
         ({
-          id: doc.id,
+          refId: doc.id,
           ...doc.data(),
         } as Trip)
     );

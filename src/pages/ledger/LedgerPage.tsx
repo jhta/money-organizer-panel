@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState, useCallback } from 'react';
 import { LedgerTransaction, Transaction } from '~/types';
 import { formatAmountToEuro, formatDate } from '~/utils';
 import './styles.css';
@@ -6,6 +6,8 @@ import firebaseService from '~/services/firebase/firebaseService';
 import Modal from 'react-modal';
 import { useAlert } from 'react-alert';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { Routes } from '~/routing/Routes';
 
 interface SelectableListProps {
   transactions: LedgerTransaction[];
@@ -99,6 +101,8 @@ export const LedgerPage: FC = () => {
     firebaseService.getLedgerTransactions()
   );
 
+  const navigate = useNavigate();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSelectedTransactions, setCurrentSelectedTransactions] =
     useState<LedgerTransaction[]>([]);
@@ -159,6 +163,7 @@ export const LedgerPage: FC = () => {
         isOpen={isModalOpen}
       >
         <h3 className="center">Create invoice</h3>
+
         <div className="modal-input-group">
           <p>Pollito income:</p>
           <input
@@ -197,6 +202,9 @@ export const LedgerPage: FC = () => {
         </div>
       </Modal>
       <h1>ledger</h1>
+      <button onClick={() => navigate(Routes.CreateLedger)}>
+        Go to create ledger
+      </button>
       <SelectableList
         transactions={ledgerTransactions}
         onSelectTransaction={onSelectTransaction}

@@ -85,4 +85,5 @@ export interface Trip {
   to: string;
   total: number;
   transactionIds: string[];
+  refId?: string;
 }

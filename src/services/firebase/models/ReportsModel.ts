@@ -29,11 +29,7 @@ export class ReportsModel extends Model {
   }
 
   public async getReports() {
-    const q = query(
-      collection(this.db, this.collection),
-      orderBy('from'),
-      limit(10)
-    );
+    const q = query(collection(this.db, this.collection), orderBy('from'));
 
     const querySnapshot = await getDocs(q);
 
@@ -73,6 +69,20 @@ export class ReportsModel extends Model {
     return transactionReports;
   }
 
+  public async getAllTransactionsByTripIdList(tripIds: string[]) {
+    const reports = await this.getReports();
+
+    const transactionReports = reports.reduce(
+      (acc: Transaction[], report) => [
+        ...acc,
+        ...filterTransactionsByTripList(report.transactions, tripIds),
+      ],
+      []
+    );
+
+    return transactionReports;
+  }
+
   public async getReportById(id: string) {
     const docRef = await getDoc(doc(this.db, Collections.Reports, id));
     const report = docRef.data() as ExpensesReport;
@@ -85,4 +95,13 @@ const filterTransactionsByTrip = (
   tripId: string
 ) => {
   return transactions.filter(transaction => transaction.tripId === tripId);
+};
+
+const filterTransactionsByTripList = (
+  transactions: Transaction[],
+  tripIds: string[]
+) => {
+  return transactions.filter(transaction =>
+    tripIds.includes(transaction.tripId || '-1')
+  );
 };
