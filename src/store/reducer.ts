@@ -120,16 +120,7 @@ export const reducer = (state: AppState, action: Actions): AppState => {
       };
 
     case ActionTypes.COMPLETE_REPORT:
-      return {
-        ...state,
-        report: {
-          ...state.report,
-          state: {
-            ...state.report.state,
-            completed: true,
-          },
-        },
-      };
+      return initialState;
 
     case ActionTypes.UPDATE_REPORT:
       console.log('UPDATE_REPORT', action.payload);

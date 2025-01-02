@@ -55,7 +55,9 @@ export const TransactionListWithCategoriesItem: FC<
   };
 
   const onPressRemoveTransaction = () => {
-    removeSelectedTransaction(transaction.id);
+    if (window.confirm('Are you sure you want to remove this transaction?')) {
+      removeSelectedTransaction(transaction.id);
+    }
   };
 
   return (
@@ -74,9 +76,17 @@ export const TransactionListWithCategoriesItem: FC<
         />
       )}
       <InputSelect options={tripOptions} onChange={onChangeTripSelected} />
-      <i className="ml-2 mr-2" onClick={onPressRemoveTransaction}>
+
+      <span
+        className="ml-2 mr-2 text-white-500 hover:text-red-500 cursor-pointer font-bold text-xl transition-colors duration-300 ease-in-out"
+        onClick={onPressRemoveTransaction}
+        aria-label="Remove transaction"
+      >
+        ×
+      </span>
+      {/* <i className="ml-2 mr-2" onClick={onPressRemoveTransaction}>
         ︎❌
-      </i>
+      </i> */}
     </li>
   );
 };

@@ -16,10 +16,12 @@ export default function AddCategories() {
 
   const tripOptions = [
     NONE_TRIP_OPTION,
-    ...(trips || []).map(trip => ({
-      value: trip.id,
-      label: trip.name,
-    })),
+    ...(trips || [])
+      .map(trip => ({
+        value: trip.id,
+        label: trip.name,
+      }))
+      .reverse(),
   ];
 
   return (
