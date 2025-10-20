@@ -11,21 +11,36 @@ const ACCEPTABLE_TRANSACTION_TYPES = [
   RevolutTransactionTypes.ATM,
 ];
 
+const formatRevolutTransactionType = (
+  type: string
+): RevolutTransactionTypes => {
+  return type.toUpperCase().replace(' ', '_') as RevolutTransactionTypes;
+};
+
+const generateRevolutTransactionId = (
+  transaction: RevolutTransaction
+): string => {
+  return `${transaction.startedDate.replaceAll(
+    ' ',
+    '-'
+  )}-${formatRevolutTransactionType(transaction.type)}-${transaction.amount}`;
+};
+
 const filterTransactions = (
   transactions: RevolutTransaction[]
 ): RevolutTransaction[] =>
   transactions
     .filter(
       item =>
-        ACCEPTABLE_TRANSACTION_TYPES.includes(item.type) &&
-        item.amount !== '0.00'
+        ACCEPTABLE_TRANSACTION_TYPES.includes(
+          formatRevolutTransactionType(item.type)
+        ) && item.amount !== '0.00'
     )
     .filter(item => item.state === 'COMPLETED')
     .map(item => ({
       ...item,
-      id: `${item.startedDate.replaceAll(' ', '-')}-${item.type}-${
-        item.amount
-      }`,
+      id: generateRevolutTransactionId(item),
+      type: formatRevolutTransactionType(item.type),
     }));
 
 const REVOLUT_TRANSACTIONS_SPECIAL_CASES = {
@@ -42,6 +57,7 @@ export const extractRevolutReportFromCSV = (
     data => {
       console.log({ data });
       const filteredTransactions = filterTransactions(data);
+      console.log('filteredTransactions', filteredTransactions);
       cb(filteredTransactions);
       localStorage.setItem('report', JSON.stringify(filterTransactions));
     }
