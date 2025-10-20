@@ -1,6 +1,7 @@
 import { Categories } from '~/types';
 
 const KNOWN_CATEGORIES_MAP = {
+  carrefour: Categories.GROCERIES,
   'albert heijn': Categories.GROCERIES,
   jumbo: Categories.GROCERIES,
   dirk: Categories.GROCERIES,
@@ -37,6 +38,8 @@ const KNOWN_CATEGORIES_MAP = {
   klm: Categories.TRAVEL,
   easyjet: Categories.TRAVEL,
   uber: Categories.TRANSPORT,
+  ovchipkaart: Categories.TRANSPORT,
+  ovpay: Categories.TRANSPORT,
   ns: Categories.TRANSPORT,
   grab: Categories.TRANSPORT,
   taxi: Categories.TRANSPORT,
@@ -80,6 +83,7 @@ const KNOWN_CATEGORIES_MAP = {
   cinema: Categories.ENTERTAINMENT,
   movie: Categories.ENTERTAINMENT,
   netflix: Categories.ENTERTAINMENT,
+  youtube: Categories.ENTERTAINMENT,
   spotify: Categories.ENTERTAINMENT,
   disney: Categories.ENTERTAINMENT,
   gaming: Categories.ENTERTAINMENT,
